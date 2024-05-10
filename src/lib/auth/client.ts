@@ -14,6 +14,7 @@ const user = {
   firstName: 'Sofia',
   lastName: 'Rivers',
   email: 'sofia@devias.io',
+  role: 'personal',
 } satisfies User;
 
 export interface SignUpParams {
@@ -21,6 +22,7 @@ export interface SignUpParams {
   lastName: string;
   email: string;
   password: string;
+  role: string;
 }
 
 export interface SignInWithOAuthParams {

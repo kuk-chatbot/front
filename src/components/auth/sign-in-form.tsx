@@ -4,6 +4,7 @@ import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { MenuItem, Select, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
@@ -11,7 +12,6 @@ import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 import { EyeSlash as EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
@@ -25,11 +25,12 @@ import { useUser } from '@/hooks/use-user';
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
   password: zod.string().min(1, { message: 'Password is required' }),
+  role: zod.string().min(1, { message: '' }), // Role field
 });
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { email: 'sofia@devias.io', password: 'Secret1' } satisfies Values;
+const defaultValues = { email: 'sofia@devias.io', password: 'Secret1', role: 'Personal' } satisfies Values;
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter();
@@ -124,6 +125,20 @@ export function SignInForm(): React.JSX.Element {
                   type={showPassword ? 'text' : 'password'}
                 />
                 {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
+              </FormControl>
+            )}
+          />
+          <Controller
+            control={control}
+            name="role"
+            defaultValue="personal"
+            render={({ field }) => (
+              <FormControl>
+                <InputLabel>Role</InputLabel>
+                <Select {...field} label="Role">
+                  <MenuItem value="personal">Personal</MenuItem>
+                  <MenuItem value="enterprise">Enterprise</MenuItem>
+                </Select>
               </FormControl>
             )}
           />

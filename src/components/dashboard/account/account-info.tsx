@@ -14,7 +14,8 @@ const user = {
   jobTitle: 'Senior Developer',
   country: 'USA',
   city: 'Los Angeles',
-  timezone: 'GTM-7',
+  // timezone: 'GTM-7',
+  role: 'Personal',
 } as const;
 
 export function AccountInfo(): React.JSX.Element {
@@ -31,7 +32,7 @@ export function AccountInfo(): React.JSX.Element {
               {user.city} {user.country}
             </Typography>
             <Typography color="text.secondary" variant="body2">
-              {user.timezone}
+              {user.role}
             </Typography>
           </Stack>
         </Stack>

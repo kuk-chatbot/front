@@ -4,6 +4,7 @@ import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { MenuItem, Select, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -13,7 +14,6 @@ import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
@@ -27,12 +27,13 @@ const schema = zod.object({
   lastName: zod.string().min(1, { message: 'Last name is required' }),
   email: zod.string().min(1, { message: 'Email is required' }).email(),
   password: zod.string().min(6, { message: 'Password should be at least 6 characters' }),
+  role: zod.string().min(1, { message: 'Role is required' }),
   terms: zod.boolean().refine((value) => value, 'You must accept the terms and conditions'),
 });
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { firstName: '', lastName: '', email: '', password: '', terms: false } satisfies Values;
+const defaultValues = { firstName: '', lastName: '', email: '', password: '', role: '', terms: false } satisfies Values;
 
 export function SignUpForm(): React.JSX.Element {
   const router = useRouter();
@@ -124,6 +125,19 @@ export function SignUpForm(): React.JSX.Element {
                 <InputLabel>Password</InputLabel>
                 <OutlinedInput {...field} label="Password" type="password" />
                 {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
+              </FormControl>
+            )}
+          />
+          <Controller
+            control={control}
+            name="role"
+            render={({ field }) => (
+              <FormControl>
+                <InputLabel>Role</InputLabel>
+                <Select {...field} label="Role">
+                  <MenuItem value="personal">Personal</MenuItem>
+                  <MenuItem value="enterprise">Enterprise</MenuItem>
+                </Select>
               </FormControl>
             )}
           />
