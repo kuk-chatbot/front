@@ -141,22 +141,13 @@ export default function Page(): React.JSX.Element {
           </Button>
         </div>
       </Stack>
-      <div style={{ width: '100vw', height: '100vh' }}>
-        <SendbirdApp
-          appId={'8AA2992B-477B-4759-A149-0B3C29BE23CF'}
-          userId={'onboarding_bot'}
-          nickname={'My first bot'}
-          profileUrl={''}
-          accessToken={'5e95bda215defc94e6ea2ab61caedfc1633ba7e0'}
-        />
-      </div>
-      {/* <CustomersFilters />
+      <CustomersFilters />
       <CustomersTable
         count={paginatedCustomers.length}
         page={page}
         rows={paginatedCustomers}
         rowsPerPage={rowsPerPage}
-      /> */}
+      />
     </Stack>
   );
 }
