@@ -14,7 +14,10 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import { App as SendbirdApp } from '@sendbird/uikit-react';
 import dayjs from 'dayjs';
+
+import '@sendbird/uikit-react/dist/index.css';
 
 import { useSelection } from '@/hooks/use-selection';
 
@@ -126,6 +129,15 @@ export function CustomersTable({
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}
       />
+      <div>
+        <SendbirdApp
+          appId={'8AA2992B-477B-4759-A149-0B3C29BE23CF'}
+          userId={'onboarding_bot'}
+          nickname={'My first bot'}
+          profileUrl={''}
+          accessToken={'5e95bda215defc94e6ea2ab61caedfc1633ba7e0'}
+        />
+      </div>
     </Card>
   );
 }

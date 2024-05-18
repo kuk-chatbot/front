@@ -6,6 +6,12 @@ import Typography from '@mui/material/Typography';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
+/*센드버드 UI kit*/
+import { App as SendbirdApp } from '@sendbird/uikit-react';
+
+import '@sendbird/uikit-react/dist/index.css';
+
+/*----*/
 import dayjs from 'dayjs';
 
 import { config } from '@/config';
@@ -135,13 +141,22 @@ export default function Page(): React.JSX.Element {
           </Button>
         </div>
       </Stack>
-      <CustomersFilters />
+      <div style={{ width: '100vw', height: '100vh' }}>
+        <SendbirdApp
+          appId={'8AA2992B-477B-4759-A149-0B3C29BE23CF'}
+          userId={'onboarding_bot'}
+          nickname={'My first bot'}
+          profileUrl={''}
+          accessToken={'5e95bda215defc94e6ea2ab61caedfc1633ba7e0'}
+        />
+      </div>
+      {/* <CustomersFilters />
       <CustomersTable
         count={paginatedCustomers.length}
         page={page}
         rows={paginatedCustomers}
         rowsPerPage={rowsPerPage}
-      />
+      /> */}
     </Stack>
   );
 }
