@@ -130,13 +130,7 @@ export function CustomersTable({
         rowsPerPageOptions={[5, 10, 25]}
       />
       <div>
-        <SendbirdApp
-          appId={'8AA2992B-477B-4759-A149-0B3C29BE23CF'}
-          userId={'onboarding_bot'}
-          nickname={'My first bot'}
-          profileUrl={''}
-          accessToken={'5e95bda215defc94e6ea2ab61caedfc1633ba7e0'}
-        />
+        <SendbirdApp appId={'8AA2992B-477B-4759-A149-0B3C29BE23CF'} userId={'bob_smith'} />
       </div>
     </Card>
   );
