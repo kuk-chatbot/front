@@ -9,18 +9,13 @@ function generateToken(): string {
 }
 
 const user = {
-  id: 'USR-000',
   avatar: '/assets/avatar.png',
-  firstName: 'Sofia',
-  lastName: 'Rivers',
-  email: 'sofia@devias.io',
+  userName: 'hanyang',
   role: 'personal',
 } satisfies User;
 
 export interface SignUpParams {
-  firstName: string;
-  lastName: string;
-  email: string;
+  userName: string;
   password: string;
   role: string;
 }
@@ -30,12 +25,12 @@ export interface SignInWithOAuthParams {
 }
 
 export interface SignInWithPasswordParams {
-  email: string;
+  userName: string;
   password: string;
 }
 
 export interface ResetPasswordParams {
-  email: string;
+  userName: string;
 }
 
 class AuthClient {
@@ -54,12 +49,12 @@ class AuthClient {
   }
 
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
-    const { email, password } = params;
+    const { userName, password } = params;
 
     // Make API request
 
     // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (email !== 'sofia@devias.io' || password !== 'Secret1') {
+    if (userName !== 'hanyang' || password !== 'Secret1') {
       return { error: 'Invalid credentials' };
     }
 

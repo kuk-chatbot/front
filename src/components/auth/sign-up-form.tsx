@@ -23,9 +23,7 @@ import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 
 const schema = zod.object({
-  firstName: zod.string().min(1, { message: 'First name is required' }),
-  lastName: zod.string().min(1, { message: 'Last name is required' }),
-  email: zod.string().min(1, { message: 'Email is required' }).email(),
+  userName: zod.string().min(1, { message: 'User name is required' }),
   password: zod.string().min(6, { message: 'Password should be at least 6 characters' }),
   role: zod.string().min(1, { message: 'Role is required' }),
   terms: zod.boolean().refine((value) => value, 'You must accept the terms and conditions'),
@@ -38,9 +36,7 @@ const schema = zod.object({
 type Values = zod.infer<typeof schema>;
 
 const defaultValues = {
-  firstName: '',
-  lastName: '',
-  email: '',
+  userName: '',
   password: '',
   role: '',
   terms: false,
@@ -104,34 +100,12 @@ export function SignUpForm(): React.JSX.Element {
         <Stack spacing={2}>
           <Controller
             control={control}
-            name="firstName"
+            name="userName"
             render={({ field }) => (
-              <FormControl error={Boolean(errors.firstName)}>
-                <InputLabel>First name</InputLabel>
-                <OutlinedInput {...field} label="First name" />
-                {errors.firstName ? <FormHelperText>{errors.firstName.message}</FormHelperText> : null}
-              </FormControl>
-            )}
-          />
-          <Controller
-            control={control}
-            name="lastName"
-            render={({ field }) => (
-              <FormControl error={Boolean(errors.firstName)}>
-                <InputLabel>Last name</InputLabel>
-                <OutlinedInput {...field} label="Last name" />
-                {errors.firstName ? <FormHelperText>{errors.firstName.message}</FormHelperText> : null}
-              </FormControl>
-            )}
-          />
-          <Controller
-            control={control}
-            name="email"
-            render={({ field }) => (
-              <FormControl error={Boolean(errors.email)}>
-                <InputLabel>Email address</InputLabel>
-                <OutlinedInput {...field} label="Email address" type="email" />
-                {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
+              <FormControl error={Boolean(errors.userName)}>
+                <InputLabel>User Name</InputLabel>
+                <OutlinedInput {...field} label="User Name" />
+                {errors.userName ? <FormHelperText>{errors.userName.message}</FormHelperText> : null}
               </FormControl>
             )}
           />

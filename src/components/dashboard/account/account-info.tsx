@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 const user = {
-  name: 'Sofia Rivers',
+  name: 'hanyang',
   avatar: '/assets/avatar.png',
   jobTitle: 'Senior Developer',
   country: 'USA',

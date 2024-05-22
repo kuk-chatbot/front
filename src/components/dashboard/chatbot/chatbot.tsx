@@ -26,8 +26,10 @@ function noop(): void {
 }
 
 export interface Customer {
-  userName: string;
+  id: string;
   avatar: string;
+  name: string;
+  userName: string;
   address: { city: string; state: string; country: string; street: string };
   phone: string;
   createdAt: Date;
@@ -47,7 +49,7 @@ export function CustomersTable({
   rowsPerPage = 0,
 }: CustomersTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
-    return rows.map((customer) => customer.userName);
+    return rows.map((customer) => customer.id);
   }, [rows]);
 
   const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
@@ -75,6 +77,7 @@ export function CustomersTable({
                 />
               </TableCell>
               <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
               <TableCell>Location</TableCell>
               <TableCell>Phone</TableCell>
               <TableCell>Signed Up</TableCell>
@@ -82,18 +85,18 @@ export function CustomersTable({
           </TableHead>
           <TableBody>
             {rows.map((row) => {
-              const isSelected = selected?.has(row.userName);
+              const isSelected = selected?.has(row.id);
 
               return (
-                <TableRow hover key={row.userName} selected={isSelected}>
+                <TableRow hover key={row.id} selected={isSelected}>
                   <TableCell padding="checkbox">
                     <Checkbox
                       checked={isSelected}
                       onChange={(event) => {
                         if (event.target.checked) {
-                          selectOne(row.userName);
+                          selectOne(row.id);
                         } else {
-                          deselectOne(row.userName);
+                          deselectOne(row.id);
                         }
                       }}
                     />
@@ -101,7 +104,7 @@ export function CustomersTable({
                   <TableCell>
                     <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
                       <Avatar src={row.avatar} />
-                      <Typography variant="subtitle2">{row.userName}</Typography>
+                      <Typography variant="subtitle2">{row.name}</Typography>
                     </Stack>
                   </TableCell>
                   <TableCell>{row.userName}</TableCell>
@@ -126,6 +129,9 @@ export function CustomersTable({
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}
       />
+      <div>
+        <SendbirdApp appId={'8AA2992B-477B-4759-A149-0B3C29BE23CF'} userId={'klsj9810'} />
+      </div>
     </Card>
   );
 }
