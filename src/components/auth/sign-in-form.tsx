@@ -23,14 +23,14 @@ import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 
 const schema = zod.object({
-  userName: zod.string().min(1, { message: 'User Name is required' }),
+  username: zod.string().min(1, { message: 'User Name is required' }),
   password: zod.string().min(1, { message: 'Password is required' }),
   role: zod.string().min(1, { message: '' }), // Role field
 });
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { userName: 'hanyang', password: 'Secret1', role: 'Personal' } satisfies Values;
+const defaultValues = { username: 'hanyang', password: 'Secret1', role: 'Personal' } satisfies Values;
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter();
@@ -85,12 +85,12 @@ export function SignInForm(): React.JSX.Element {
         <Stack spacing={2}>
           <Controller
             control={control}
-            name="userName"
+            name="username"
             render={({ field }) => (
-              <FormControl error={Boolean(errors.userName)}>
+              <FormControl error={Boolean(errors.username)}>
                 <InputLabel>User Name</InputLabel>
                 <OutlinedInput {...field} label="User Name" />
-                {errors.userName ? <FormHelperText>{errors.userName.message}</FormHelperText> : null}
+                {errors.username ? <FormHelperText>{errors.username.message}</FormHelperText> : null}
               </FormControl>
             )}
           />

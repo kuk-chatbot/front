@@ -2,22 +2,24 @@
 
 import type { User } from '@/types/user';
 
-function generateToken(): string {
-  const arr = new Uint8Array(12);
-  window.crypto.getRandomValues(arr);
-  return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
-}
-
-const user = {
-  avatar: '/assets/avatar.png',
-  userName: 'hanyang',
-  role: 'personal',
-} satisfies User;
+// const user = {
+//   id: 'USR-000',
+//   avatar: '/assets/avatar.png',
+//   firstName: 'Sofia',
+//   lastName: 'Rivers',
+//   email: 'sofia@devias.io',
+//   role: 'personal',
+// } satisfies User;
 
 export interface SignUpParams {
-  userName: string;
+  username: string;
+  name: string;
   password: string;
   role: string;
+  userlimit?: number;
+  memory?: number;
+  cores?: number;
+  sockets?: number;
 }
 
 export interface SignInWithOAuthParams {
@@ -25,69 +27,128 @@ export interface SignInWithOAuthParams {
 }
 
 export interface SignInWithPasswordParams {
-  userName: string;
+  email: string;
   password: string;
 }
 
-export interface ResetPasswordParams {
-  userName: string;
-}
+// export interface ResetPasswordParams {
+//   email: string;
+// }
 
 class AuthClient {
-  async signUp(_: SignUpParams): Promise<{ error?: string }> {
-    // Make API request
+  async signUp(params: SignUpParams): Promise<{ error?: string }> {
+    try {
+      const response = await fetch('http://localhost:8000/auth/sign-up', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params),
+      });
 
-    // We do not handle the API, so we'll just generate a token and store it in localStorage.
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
 
-    return {};
+      if (!response.ok) {
+        
+        const errorData: unknown = await response.json();
+        if (this.isErrorResponse(errorData)) {
+          return { error: errorData.message || 'Something went wrong' };
+        }
+        return { error: 'Something went wrong' };
+      }
+
+      const responseData: unknown = await response.json();
+      if (this.isAuthResponse(responseData)) {
+        
+        localStorage.setItem('custom-auth-token', responseData.token);
+      }
+
+      return {};
+    } catch (error) {
+
+      
+      return { error: 'Network error' };
+    }
   }
 
-  async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
-    return { error: 'Social authentication not implemented' };
+  private isErrorResponse(data: unknown): data is { message: string } {
+    return typeof data === 'object' && data !== null && 'message' in data;
   }
+
+  private isAuthResponse(data: unknown): data is { token: string } {
+    return typeof data === 'object' && data !== null && 'token' in data;
+  }
+
+  // async signInWithOAuth(params: SignInWithOAuthParams): Promise<{ error?: string }> {
+  //   return { error: 'Social authentication not implemented' };
+  // }
 
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
-    const { userName, password } = params;
+    const { email, password } = params;
 
-    // Make API request
+    try {
+      const response = await fetch('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: email, password }),
+      });
 
-    // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (userName !== 'hanyang' || password !== 'Secret1') {
-      return { error: 'Invalid credentials' };
+      if (!response.ok) {
+        const errorData: unknown = await response.json();
+        if (this.isErrorResponse(errorData)) {
+          return { error: errorData.message || 'Invalid credentials' };
+        }
+        return { error: 'Invalid credentials' };
+      }
+
+      const responseData: unknown = await response.json();
+      if (this.isAuthResponse(responseData)) {
+        localStorage.setItem('custom-auth-token', responseData.token);
+      }
+
+      return {};
+    } catch (error) {
+      return { error: 'Network error' };
     }
-
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
-
-    return {};
   }
 
-  async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Password reset not implemented' };
-  }
+  // async resetPassword(params: ResetPasswordParams): Promise<{ error?: string }> {
+  //   return { error: 'Password reset not implemented' };
+  // }
 
-  async updatePassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Update reset not implemented' };
-  }
+  // async updatePassword(params: ResetPasswordParams): Promise<{ error?: string }> {
+  //   return { error: 'Update reset not implemented' };
+  // }
 
   async getUser(): Promise<{ data?: User | null; error?: string }> {
-    // Make API request
-
-    // We do not handle the API, so just check if we have a token in localStorage.
     const token = localStorage.getItem('custom-auth-token');
 
     if (!token) {
       return { data: null };
     }
 
-    return { data: user };
+    try {
+      const response = await fetch('/auth/user', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        return { data: null };
+      }
+
+      const userData = await response.json();
+      return { data: userData };
+    } catch (error) {
+      return { error: 'Network error' };
+    }
   }
 
   async signOut(): Promise<{ error?: string }> {
     localStorage.removeItem('custom-auth-token');
-
     return {};
   }
 }

@@ -4,12 +4,12 @@ import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormLabel, MenuItem, Radio, RadioGroup, Select, Stack } from '@mui/material';
+import { MenuItem, Select, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
+// import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
+// import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
@@ -23,27 +23,27 @@ import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 
 const schema = zod.object({
-  userName: zod.string().min(1, { message: 'User name is required' }),
+  username: zod.string().min(1, { message: 'User name is required' }),
   password: zod.string().min(6, { message: 'Password should be at least 6 characters' }),
+  name: zod.string().min(1, { message: 'Name is required' }),
   role: zod.string().min(1, { message: 'Role is required' }),
-  terms: zod.boolean().refine((value) => value, 'You must accept the terms and conditions'),
-  concurrentUserCount: zod.string().min(1, { message: 'input number!' }),
-  availableRAM: zod.string().min(1, { message: 'check' }),
-  cpuType: zod.string().min(1, { message: 'check' }),
-  cpuCount: zod.string().min(1, { message: 'check' }),
+  userlimit: zod.preprocess((val) => Number(val), zod.number().optional()),
+  memory: zod.preprocess((val) => Number(val), zod.number().optional()),
+  cores: zod.preprocess((val) => Number(val), zod.number().optional()),
+  sockets: zod.preprocess((val) => Number(val), zod.number().optional()),
 });
 
 type Values = zod.infer<typeof schema>;
 
 const defaultValues = {
-  userName: '',
+  username: '',
   password: '',
+  name: '',
   role: '',
-  terms: false,
-  concurrentUserCount: '',
-  availableRAM: '',
-  cpuType: '',
-  cpuCount: '',
+  userlimit: undefined,
+  memory: undefined,
+  cores: undefined,
+  sockets: undefined,
 } satisfies Values;
 
 export function SignUpForm(): React.JSX.Element {
@@ -60,6 +60,7 @@ export function SignUpForm(): React.JSX.Element {
     formState: { errors },
     watch,
   } = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
+
 
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
@@ -100,12 +101,12 @@ export function SignUpForm(): React.JSX.Element {
         <Stack spacing={2}>
           <Controller
             control={control}
-            name="userName"
+            name="username"
             render={({ field }) => (
-              <FormControl error={Boolean(errors.userName)}>
+              <FormControl error={Boolean(errors.username)}>
                 <InputLabel>User Name</InputLabel>
                 <OutlinedInput {...field} label="User Name" />
-                {errors.userName ? <FormHelperText>{errors.userName.message}</FormHelperText> : null}
+                {errors.username ? <FormHelperText>{errors.username.message}</FormHelperText> : null}
               </FormControl>
             )}
           />
@@ -122,88 +123,80 @@ export function SignUpForm(): React.JSX.Element {
           />
           <Controller
             control={control}
+            name="name"
+            render={({ field }) => (
+              <FormControl error={Boolean(errors.name)}>
+                <InputLabel>Name</InputLabel>
+                <OutlinedInput {...field} label="Name" />
+                {errors.name ? <FormHelperText>{errors.name.message}</FormHelperText> : null}
+              </FormControl>
+            )}
+          />
+          <Controller
+            control={control}
             name="role"
             render={({ field }) => (
               <FormControl>
                 <InputLabel>Role</InputLabel>
                 <Select {...field} label="Role">
-                  <MenuItem value="personal">Personal</MenuItem>
-                  <MenuItem value="enterprise">Enterprise</MenuItem>
+                  <MenuItem value="PERSONAL">PERSONAL</MenuItem>
+                  <MenuItem value="ENTERPRISE">ENTERPRISE</MenuItem>
                 </Select>
               </FormControl>
             )}
           />
-          {role === 'enterprise' && (
+          {role === 'ENTERPRISE' && (
             <Stack spacing={2}>
               <Typography color="text.secondary" variant="body2">
                 Design your service performance
               </Typography>
               <Controller
                 control={control}
-                name="concurrentUserCount"
+                name="userlimit"
                 render={({ field }) => (
-                  <FormControl>
-                    <InputLabel>동시 사용자 수</InputLabel>
-                    <OutlinedInput {...field} type="number" label="동시 사용자 수" />
+                  <FormControl error={Boolean(errors.userlimit)}>
+                    <InputLabel>User Limit</InputLabel>
+                    <OutlinedInput {...field} type="number" label="User Limit" />
+                    {errors.userlimit ? <FormHelperText>{errors.userlimit.message}</FormHelperText> : null}
                   </FormControl>
                 )}
               />
               <Controller
                 control={control}
-                name="availableRAM"
+                name="memory"
                 render={({ field }) => (
-                  <FormControl>
-                    <InputLabel>메모리</InputLabel>
-                    <Select {...field} label="메모리">
-                      <MenuItem value="1GiB">1 GiB 메모리</MenuItem>
-                      <MenuItem value="2GiB">2 GiB 메모리</MenuItem>
-                      <MenuItem value="4GiB">4 GiB 메모리</MenuItem>
-                      <MenuItem value="8GiB">8 GiB 메모리</MenuItem>
-                      <MenuItem value="16GiB">16 GiB 메모리</MenuItem>
-                      <MenuItem value="32GiB">32 GiB 메모리</MenuItem>
-                    </Select>
+                  <FormControl error={Boolean(errors.memory)}>
+                    <InputLabel>Memory</InputLabel>
+                    <OutlinedInput {...field} type="number" label="Memory" />
+                    {errors.memory ? <FormHelperText>{errors.memory.message}</FormHelperText> : null}
                   </FormControl>
                 )}
               />
               <Controller
                 control={control}
-                name="cpuType"
+                name="cores"
                 render={({ field }) => (
-                  <FormControl>
-                    <FormLabel id="demo-radio-buttons-group-label">CPU 아키텍처</FormLabel>
-                    <RadioGroup
-                      row
-                      {...field}
-                      aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="64비트(x86)"
-                      name="radio-buttons-group"
-                    >
-                      <FormControlLabel value="64비트(x86)" control={<Radio />} label="64비트(x86)" />
-                      <FormControlLabel value="64비트(Arm)" control={<Radio />} label="64비트(Arm)" />
-                    </RadioGroup>
+                  <FormControl error={Boolean(errors.cores)}>
+                    <InputLabel>Cores</InputLabel>
+                    <OutlinedInput {...field} type="number" label="Cores" />
+                    {errors.cores ? <FormHelperText>{errors.cores.message}</FormHelperText> : null}
                   </FormControl>
                 )}
               />
               <Controller
                 control={control}
-                name="cpuCount"
+                name="sockets"
                 render={({ field }) => (
-                  <FormControl>
-                    <InputLabel>가상 CPU 수</InputLabel>
-                    <Select {...field} label="가상 CPU 수">
-                      <MenuItem value="1vCPU">1 vCPU</MenuItem>
-                      <MenuItem value="2vCPU">2 vCPU</MenuItem>
-                      <MenuItem value="4vCPU">4 vCPU</MenuItem>
-                      <MenuItem value="8vCPU">8 vCPU</MenuItem>
-                      <MenuItem value="16vCPU">16 vCPU</MenuItem>
-                    </Select>
+                  <FormControl error={Boolean(errors.sockets)}>
+                    <InputLabel>Sockets</InputLabel>
+                    <OutlinedInput {...field} type="number" label="Sockets" />
+                    {errors.sockets ? <FormHelperText>{errors.sockets.message}</FormHelperText> : null}
                   </FormControl>
                 )}
               />
             </Stack>
           )}
-
-          <Controller
+          {/* <Controller
             control={control}
             name="terms"
             render={({ field }) => (
@@ -220,7 +213,7 @@ export function SignUpForm(): React.JSX.Element {
               </div>
             )}
           />
-          {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
+          {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null} */}
           <Button disabled={isPending} type="submit" variant="contained">
             Sign up
           </Button>
