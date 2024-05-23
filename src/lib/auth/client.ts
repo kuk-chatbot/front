@@ -27,7 +27,7 @@ export interface SignInWithOAuthParams {
 }
 
 export interface SignInWithPasswordParams {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -48,7 +48,7 @@ class AuthClient {
 
 
       if (!response.ok) {
-        
+
         const errorData: unknown = await response.json();
         if (this.isErrorResponse(errorData)) {
           return { error: errorData.message || 'Something went wrong' };
@@ -56,11 +56,13 @@ class AuthClient {
         return { error: 'Something went wrong' };
       }
 
+      //responseData에 {"status":200,"data":1}
       const responseData: unknown = await response.json();
       if (this.isAuthResponse(responseData)) {
         
         localStorage.setItem('custom-auth-token', responseData.token);
       }
+
 
       return {};
     } catch (error) {
@@ -83,15 +85,23 @@ class AuthClient {
   // }
 
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
-    const { email, password } = params;
+    // const { username, password } = params;
 
     try {
-      const response = await fetch('/auth/login', {
+      
+      
+      const { username, password } = params;
+      
+      // role을 제외한 새로운 객체를 만듭니다.
+      const filteredParams = { username, password };
+      
+      
+      const response = await fetch('http://localhost:8000/auth/sign-in', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username: email, password }),
+        body: JSON.stringify(filteredParams),
       });
 
       if (!response.ok) {
@@ -101,14 +111,18 @@ class AuthClient {
         }
         return { error: 'Invalid credentials' };
       }
+      
 
       const responseData: unknown = await response.json();
       if (this.isAuthResponse(responseData)) {
         localStorage.setItem('custom-auth-token', responseData.token);
       }
+  
 
       return {};
     } catch (error) {
+
+      
       return { error: 'Network error' };
     }
   }

@@ -67,6 +67,7 @@ export function SignInForm(): React.JSX.Element {
       // After refresh, GuestGuard will handle the redirect
       router.refresh();
     },
+    
     [checkSession, router, setError]
   );
 
