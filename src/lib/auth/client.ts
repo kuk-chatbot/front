@@ -24,14 +24,40 @@ export interface SignInWithPasswordParams {
 }
 
 class AuthClient {
+  constructor() {
+    // Axios 인터셉터 설정
+    axios.interceptors.request.use(config => {
+      const token = localStorage.getItem('custom-auth-token');
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+      return config;
+    });
+
+    axios.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response && error.response.status === 401) {
+          // 토큰이 유효하지 않음
+          this.signOut();
+          window.location.href = '/auth/sign-in';
+        }
+        return Promise.reject(error);
+      }
+    );
+  }
+
   async signUp(params: SignUpParams): Promise<{ error?: string }> {
     try {
-      const response = await axios.post('http://localhost:8000/auth/sign-up', params, {
+      // params 가공
+      const filteredParams = this.filterSignUpParams(params);
+  
+      const response = await axios.post('http://localhost:8000/auth/sign-up', filteredParams, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-
+  
       if (response.status !== 200) {
         const errorData = response.data;
         if (this.isErrorResponse(errorData)) {
@@ -39,12 +65,27 @@ class AuthClient {
         }
         return { error: 'Something went wrong' };
       }
-
+  
       return {};
     } catch (error) {
       console.error('Sign up error:', error);
       return { error: 'Network error' };
     }
+  }
+  
+  // SIGNUP 파라미터 필터링 메서드
+  private filterSignUpParams(params: SignUpParams): Partial<SignUpParams> {
+    const { role, username, name, password, userlimit, memory, cores, sockets } = params;
+    const filteredParams: Partial<SignUpParams> = { role, username, name, password };
+  
+    if (role !== 'PERSONAL') {
+      if (userlimit !== 0) filteredParams.userlimit = userlimit;
+      if (memory !== 0) filteredParams.memory = memory;
+      if (cores !== 0) filteredParams.cores = cores;
+      if (sockets !== 0) filteredParams.sockets = sockets;
+    }
+  
+    return filteredParams;
   }
 
   private isErrorResponse(data: unknown): data is { message: string } {
@@ -74,6 +115,7 @@ class AuthClient {
       const responseData = response.data;
       if (this.isAuthResponse(responseData)) {
         localStorage.setItem('custom-auth-token', responseData.jwtToken);
+        window.location.href = '/dashboard';
       }
 
       return {};

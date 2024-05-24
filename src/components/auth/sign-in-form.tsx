@@ -128,20 +128,6 @@ export function SignInForm(): React.JSX.Element {
               </FormControl>
             )}
           />
-          <Controller
-            control={control}
-            name="role"
-            defaultValue="personal"
-            render={({ field }) => (
-              <FormControl>
-                <InputLabel>Role</InputLabel>
-                <Select {...field} label="Role">
-                  <MenuItem value="personal">Personal</MenuItem>
-                  <MenuItem value="enterprise">Enterprise</MenuItem>
-                </Select>
-              </FormControl>
-            )}
-          />
           <div>
             <Link component={RouterLink} href={paths.auth.resetPassword} variant="subtitle2">
               Forgot password?

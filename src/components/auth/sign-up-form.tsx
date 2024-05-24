@@ -19,7 +19,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 
 import { paths } from '@/paths';
-import { authClient } from '@/lib/auth/client';
+import { authClient, SignUpParams } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 
 const schema = zod.object({
@@ -27,10 +27,10 @@ const schema = zod.object({
   password: zod.string().min(6, { message: 'Password should be at least 6 characters' }),
   name: zod.string().min(1, { message: 'Name is required' }),
   role: zod.string().min(1, { message: 'Role is required' }),
-  userlimit: zod.preprocess((val) => Number(val), zod.number().optional()),
-  memory: zod.preprocess((val) => Number(val), zod.number().optional()),
-  cores: zod.preprocess((val) => Number(val), zod.number().optional()),
-  sockets: zod.preprocess((val) => Number(val), zod.number().optional()),
+  userlimit: zod.preprocess((val) => val === '' ? undefined : Number(val), zod.number().optional()),
+  memory: zod.preprocess((val) => val === '' ? undefined : Number(val), zod.number().optional()),
+  cores: zod.preprocess((val) => val === '' ? undefined : Number(val), zod.number().optional()),
+  sockets: zod.preprocess((val) => val === '' ? undefined : Number(val), zod.number().optional()),
 });
 
 type Values = zod.infer<typeof schema>;
@@ -39,18 +39,16 @@ const defaultValues = {
   username: '',
   password: '',
   name: '',
-  role: '',
-  userlimit: undefined,
-  memory: undefined,
-  cores: undefined,
-  sockets: undefined,
+  role: 'PERSONAL',
+  userlimit: 0,
+  memory: 0,
+  cores: 0,
+  sockets: 0,
 } satisfies Values;
 
 export function SignUpForm(): React.JSX.Element {
   const router = useRouter();
-
   const { checkSession } = useUser();
-
   const [isPending, setIsPending] = React.useState<boolean>(false);
 
   const {
@@ -61,12 +59,18 @@ export function SignUpForm(): React.JSX.Element {
     watch,
   } = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
 
-
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
       setIsPending(true);
 
-      const { error } = await authClient.signUp(values);
+      const { role, username, name, password, userlimit, memory, cores, sockets } = values;
+      let signUpParams: Partial<SignUpParams> = { role, username, name, password };
+
+      if (role === 'ENTERPRISE') {
+        signUpParams = { ...signUpParams, userlimit, memory, cores, sockets };
+      }
+
+      const { error } = await authClient.signUp(signUpParams as SignUpParams);
 
       if (error) {
         setError('root', { type: 'server', message: error });
@@ -74,11 +78,6 @@ export function SignUpForm(): React.JSX.Element {
         return;
       }
 
-      // Refresh the auth state
-      //await checkSession?.();
-
-      // UserProvider, for this case, will not refresh the router
-      // After refresh, GuestGuard will handle the redirect
       router.push(paths.auth.signIn);
     },
     [checkSession, router, setError]
