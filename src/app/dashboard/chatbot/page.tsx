@@ -15,7 +15,7 @@ import '@sendbird/uikit-react/dist/index.css';
 import dayjs from 'dayjs';
 
 import { config } from '@/config';
-import { CustomersTable } from '@/components/dashboard/chatbot/chatbot';
+import { Chatbottable } from '@/components/dashboard/chatbot/chatbot';
 import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
 import type { Customer } from '@/components/dashboard/customer/customers-table';
 
@@ -47,6 +47,7 @@ export default function Page(): React.JSX.Element {
           </Button>
         </div>
       </Stack>
+      <Chatbottable />
       <CustomersFilters />
     </Stack>
   );
