@@ -1,15 +1,7 @@
 'use client';
 
 import type { User } from '@/types/user';
-
-// const user = {
-//   id: 'USR-000',
-//   avatar: '/assets/avatar.png',
-//   firstName: 'Sofia',
-//   lastName: 'Rivers',
-//   email: 'sofia@devias.io',
-//   role: 'personal',
-// } satisfies User;
+import axios from 'axios';
 
 export interface SignUpParams {
   username: string;
@@ -31,44 +23,26 @@ export interface SignInWithPasswordParams {
   password: string;
 }
 
-// export interface ResetPasswordParams {
-//   email: string;
-// }
-
 class AuthClient {
   async signUp(params: SignUpParams): Promise<{ error?: string }> {
     try {
-      const response = await fetch('http://localhost:8000/auth/sign-up', {
-        method: 'POST',
+      const response = await axios.post('http://localhost:8000/auth/sign-up', params, {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(params),
       });
 
-
-      if (!response.ok) {
-        const errorData: unknown = await response.json();
+      if (response.status !== 200) {
+        const errorData = response.data;
         if (this.isErrorResponse(errorData)) {
           return { error: errorData.message || 'Something went wrong' };
         }
         return { error: 'Something went wrong' };
       }
 
-      //responseData에 {"status":200,"data":1}
-      const responseData: unknown = await response.json();
-      if (this.isAuthResponse(responseData)) {
-        
-        localStorage.setItem('custom-auth-token', responseData.token);
-      }
-
-      
-
-
       return {};
     } catch (error) {
-
-      
+      console.error('Sign up error:', error);
       return { error: 'Network error' };
     }
   }
@@ -77,64 +51,37 @@ class AuthClient {
     return typeof data === 'object' && data !== null && 'message' in data;
   }
 
-  private isAuthResponse(data: unknown): data is { token: string } {
-    return typeof data === 'object' && data !== null && 'token' in data;
+  private isAuthResponse(data: unknown): data is { jwtToken: string } {
+    return typeof data === 'object' && data !== null && 'jwtToken' in data;
   }
 
-  // async signInWithOAuth(params: SignInWithOAuthParams): Promise<{ error?: string }> {
-  //   return { error: 'Social authentication not implemented' };
-  // }
-
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
-    // const { username, password } = params;
-
     try {
-      
-      
-      const { username, password } = params;
-      
-      // role을 제외한 새로운 객체를 만듭니다.
-      const filteredParams = { username, password };
-      
-      
-      const response = await fetch('http://localhost:8000/auth/sign-in', {
-        method: 'POST',
+      const response = await axios.post('http://localhost:8000/auth/sign-in', params, {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(filteredParams),
       });
 
-      if (!response.ok) {
-        const errorData: unknown = await response.json();
+      if (response.status !== 200) {
+        const errorData = response.data;
         if (this.isErrorResponse(errorData)) {
           return { error: errorData.message || 'Invalid credentials' };
         }
         return { error: 'Invalid credentials' };
       }
-      
 
-      const responseData: unknown = await response.json();
+      const responseData = response.data;
       if (this.isAuthResponse(responseData)) {
-        localStorage.setItem('custom-auth-token', responseData.token);
+        localStorage.setItem('custom-auth-token', responseData.jwtToken);
       }
-  
 
       return {};
     } catch (error) {
-
-      
+      console.error('Sign in error:', error);
       return { error: 'Network error' };
     }
   }
-
-  // async resetPassword(params: ResetPasswordParams): Promise<{ error?: string }> {
-  //   return { error: 'Password reset not implemented' };
-  // }
-
-  // async updatePassword(params: ResetPasswordParams): Promise<{ error?: string }> {
-  //   return { error: 'Update reset not implemented' };
-  // }
 
   async getUser(): Promise<{ data?: User | null; error?: string }> {
     const token = localStorage.getItem('custom-auth-token');
@@ -144,20 +91,20 @@ class AuthClient {
     }
 
     try {
-      const response = await fetch('/auth/user', {
-        method: 'GET',
+      const response = await axios.get('http://localhost:8000/auth/user', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         return { data: null };
       }
 
-      const userData = await response.json();
+      const userData = response.data;
       return { data: userData };
     } catch (error) {
+      console.error('Get user error:', error);
       return { error: 'Network error' };
     }
   }
