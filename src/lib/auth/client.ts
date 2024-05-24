@@ -48,7 +48,6 @@ class AuthClient {
 
 
       if (!response.ok) {
-
         const errorData: unknown = await response.json();
         if (this.isErrorResponse(errorData)) {
           return { error: errorData.message || 'Something went wrong' };
@@ -62,6 +61,8 @@ class AuthClient {
         
         localStorage.setItem('custom-auth-token', responseData.token);
       }
+
+      
 
 
       return {};
