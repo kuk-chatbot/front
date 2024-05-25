@@ -15,11 +15,11 @@ import '@sendbird/uikit-react/dist/index.css';
 import dayjs from 'dayjs';
 
 import { config } from '@/config';
-import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
-import { CustomersTable } from '@/components/dashboard/customer/customers-table';
-import type { Customer } from '@/components/dashboard/customer/customers-table';
+import { CustomersFilters } from '@/components/motherboard/customer/customers-filters';
+import { CustomersTable } from '@/components/motherboard/customer/customers-table';
+import type { Customer } from '@/components/motherboard/customer/customers-table';
 
-export const metadata = { title: `Customers | Dashboard | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Customers | motherboard | ${config.site.name}` } satisfies Metadata;
 
 const customers = [
   {

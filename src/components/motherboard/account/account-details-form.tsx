@@ -36,7 +36,7 @@ export function AccountDetailsForm(): React.JSX.Element {
 
     try {
       const response = await axios.put(
-        'http://localhost:8000/dashboard/account',
+        'http://localhost:8000/motherboard/account',
         {
           userlimit: Number(userlimit),
           memory: Number(memory),
