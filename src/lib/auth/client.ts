@@ -90,7 +90,7 @@ class AuthClient {
 
 
 
-      document.write(JSON.stringify(responseData));
+      // document.write(JSON.stringify(responseData));
 
       localStorage.setItem('custom-auth-token', responseData.jwtToken);
       
