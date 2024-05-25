@@ -39,7 +39,6 @@ interface AuthResponse {
 class AuthClient {
   async signUp(params: SignUpParams): Promise<{ error?: string }> {
     try {
-      document.write(JSON.stringify(params));
       const response: AxiosResponse<unknown> = await axios.post('http://localhost:8000/auth/sign-up', params, {
         headers: {
           'Content-Type': 'application/json',
@@ -89,8 +88,6 @@ class AuthClient {
 
 
 
-
-      // document.write(JSON.stringify(responseData));
 
       localStorage.setItem('custom-auth-token', responseData.jwtToken);
       

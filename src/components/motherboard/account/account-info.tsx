@@ -39,7 +39,7 @@ export function AccountInfo(): React.JSX.Element {
       }
 
       try {
-        const response = await axios.get('http://localhost:8000/dashboard/account', {
+        const response = await axios.get('http://localhost:8000/motherboard/account', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
