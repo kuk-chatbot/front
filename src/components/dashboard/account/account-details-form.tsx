@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import axios from 'axios';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -9,25 +10,59 @@ import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import Select from '@mui/material/Select';
 import Grid from '@mui/material/Unstable_Grid2';
-
-const states = [
-  { value: 'alabama', label: 'Alabama' },
-  { value: 'new-york', label: 'New York' },
-  { value: 'san-francisco', label: 'San Francisco' },
-  { value: 'los-angeles', label: 'Los Angeles' },
-] as const;
+import Alert from '@mui/material/Alert';
 
 export function AccountDetailsForm(): React.JSX.Element {
+  const [userlimit, setUserlimit] = React.useState<number | string>('');
+  const [memory, setMemory] = React.useState<number | string>('');
+  const [cores, setCores] = React.useState<number | string>('');
+  const [sockets, setSockets] = React.useState<number | string>('');
+  const [error, setError] = React.useState<string | null>(null);
+  const [success, setSuccess] = React.useState<string | null>(null);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    const token = localStorage.getItem('custom-auth-token');
+
+    if (!token) {
+      setError('No token found');
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        'http://localhost:8000/dashboard/account',
+        {
+          userlimit: Number(userlimit),
+          memory: Number(memory),
+          cores: Number(cores),
+          sockets: Number(sockets),
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setSuccess('Details updated successfully');
+      } else {
+        setError('Failed to update details');
+      }
+    } catch (err) {
+      setError('An error occurred while updating details');
+    }
+  };
+
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault();
-      }}
-    >
+    <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader subheader="The information can be edited" title="Profile" />
         <Divider />
@@ -35,52 +70,60 @@ export function AccountDetailsForm(): React.JSX.Element {
           <Grid container spacing={3}>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>First name</InputLabel>
-                <OutlinedInput defaultValue="Sofia" label="First name" name="firstName" />
+                <InputLabel>User Limit</InputLabel>
+                <OutlinedInput
+                  label="User Limit"
+                  name="userlimit"
+                  type="number"
+                  value={userlimit}
+                  onChange={(e) => setUserlimit(e.target.value)}
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Last name</InputLabel>
-                <OutlinedInput defaultValue="Rivers" label="Last name" name="lastName" />
+                <InputLabel>Memory (GB)</InputLabel>
+                <OutlinedInput
+                  label="Memory"
+                  name="memory"
+                  type="number"
+                  value={memory}
+                  onChange={(e) => setMemory(e.target.value)}
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Email address</InputLabel>
-                <OutlinedInput defaultValue="sofia@devias.io" label="Email address" name="email" />
+                <InputLabel>Cores</InputLabel>
+                <OutlinedInput
+                  label="Cores"
+                  name="cores"
+                  type="number"
+                  value={cores}
+                  onChange={(e) => setCores(e.target.value)}
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Phone number</InputLabel>
-                <OutlinedInput label="Phone number" name="phone" type="tel" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>State</InputLabel>
-                <Select defaultValue="New York" label="State" name="state" variant="outlined">
-                  {states.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>City</InputLabel>
-                <OutlinedInput label="City" />
+              <FormControl fullWidth required>
+                <InputLabel>Sockets</InputLabel>
+                <OutlinedInput
+                  label="Sockets"
+                  name="sockets"
+                  type="number"
+                  value={sockets}
+                  onChange={(e) => setSockets(e.target.value)}
+                />
               </FormControl>
             </Grid>
           </Grid>
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">Save details</Button>
+          <Button type="submit" variant="contained">Save details</Button>
         </CardActions>
+        {error && <Alert severity="error">{error}</Alert>}
+        {success && <Alert severity="success">{success}</Alert>}
       </Card>
     </form>
   );
