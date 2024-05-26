@@ -16,8 +16,8 @@ import dayjs from 'dayjs';
 
 import { config } from '@/config';
 import { CustomersTable } from '@/components/motherboard/chatbot/chatbot';
-import { CustomersFilters } from '@/components/motherboard/customer/customers-filters';
-import type { Customer } from '@/components/motherboard/customer/customers-table';
+import { CustomersFilters } from '@/components/motherboard/customers/customers-filters';
+import type { Customer } from '@/components/motherboard/summary/customers-table';
 
 export const metadata = { title: `Customers | motherboard | ${config.site.name}` } satisfies Metadata;
 

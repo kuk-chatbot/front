@@ -78,13 +78,14 @@ class AuthClient {
 
 
 
-
       if (response.status !== 200) {
         const errorData = response.data as ErrorResponse;
         return { error: errorData.message || 'Invalid credentials' };
       }
 
       const responseData = response.data as AuthResponse;
+
+      document.write(JSON.stringify(responseData));
 
 
 
