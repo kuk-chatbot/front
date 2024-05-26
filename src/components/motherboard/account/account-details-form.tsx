@@ -14,6 +14,18 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Alert from '@mui/material/Alert';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import CircularProgress from '@mui/material/CircularProgress';
+
+interface User {
+  id: number;
+  username: string;
+  name: string;
+  role: string;
+  userlimit?: number;
+  memory?: number;
+  cores?: number;
+  sockets?: number;
+}
 
 export function AccountDetailsForm(): React.JSX.Element {
   const [userlimit, setUserlimit] = React.useState<string>('');
@@ -22,6 +34,8 @@ export function AccountDetailsForm(): React.JSX.Element {
   const [sockets, setSockets] = React.useState<string>('');
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
+
+  const [user, setUser] = React.useState<User | null>(null);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -63,98 +77,140 @@ export function AccountDetailsForm(): React.JSX.Element {
     }
   };
 
+  React.useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem('custom-auth-token');
+
+      if (!token) {
+        setError('No token found');
+        return;
+      }
+
+      try {
+        const response = await axios.get('http://localhost:8000/motherboard/account', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+
+        if (response.status === 200) {
+          setUser(response.data);
+        } else {
+          setError('Failed to fetch user data');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching user data');
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  if (error) {
+    return <Alert severity="error">{error}</Alert>;
+  }
+
+  if (!user) {
+    return <CircularProgress />;
+  }
+
   return (
-    <form onSubmit={handleSubmit}>
-      <Card>
-        <CardHeader subheader="The information can be edited" title="Profile" />
-        <Divider />
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>User Limit</InputLabel>
-                <Select
-                  label="User Limit"
-                  name="userlimit"
-                  value={userlimit}
-                  onChange={(e) => setUserlimit(e.target.value)}
-                >
-                  <MenuItem value="" disabled>
-                    <em>Select User Limit</em>
-                  </MenuItem>
-                  <MenuItem value="25">25</MenuItem>
-                  <MenuItem value="50">50</MenuItem>
-                  <MenuItem value="75">75</MenuItem>
-                  <MenuItem value="100">100</MenuItem>
-                </Select>
-              </FormControl>
+    <>
+    {user.role !== 'PERSONAL' && (
+      <form onSubmit={handleSubmit}>
+        <Card>
+          <CardHeader subheader="The information can be edited" title="Profile" />
+          <Divider />
+          <CardContent>
+            <Grid container spacing={3}>
+              <Grid md={6} xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel>User Limit</InputLabel>
+                  <Select
+                    label="User Limit"
+                    name="userlimit"
+                    value={userlimit}
+                    onChange={(e) => setUserlimit(e.target.value)}
+                  >
+                    <MenuItem value="" disabled>
+                      <em>Select User Limit</em>
+                    </MenuItem>
+                    <MenuItem value="25">25</MenuItem>
+                    <MenuItem value="50">50</MenuItem>
+                    <MenuItem value="75">75</MenuItem>
+                    <MenuItem value="100">100</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel>Memory (GB)</InputLabel>
+                  <Select
+                    label="Memory"
+                    name="memory"
+                    value={memory}
+                    onChange={(e) => setMemory(e.target.value)}
+                  >
+                    <MenuItem value="" disabled>
+                      <em>Select Memory</em>
+                    </MenuItem>
+                    <MenuItem value="8">8GB</MenuItem>
+                    <MenuItem value="16">16GB</MenuItem>
+                    <MenuItem value="32">32GB</MenuItem>
+                    <MenuItem value="64">64GB</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel>Cores</InputLabel>
+                  <Select
+                    label="Cores"
+                    name="cores"
+                    value={cores}
+                    onChange={(e) => setCores(e.target.value)}
+                  >
+                    <MenuItem value="" disabled>
+                      <em>Select Cores</em>
+                    </MenuItem>
+                    <MenuItem value="4">4</MenuItem>
+                    <MenuItem value="8">8</MenuItem>
+                    <MenuItem value="16">16</MenuItem>
+                    <MenuItem value="32">32</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel>Sockets</InputLabel>
+                  <Select
+                    label="Sockets"
+                    name="sockets"
+                    value={sockets}
+                    onChange={(e) => setSockets(e.target.value)}
+                  >
+                    <MenuItem value="" disabled>
+                      <em>Select Sockets</em>
+                    </MenuItem>
+                    <MenuItem value="1">1</MenuItem>
+                    <MenuItem value="2">2</MenuItem>
+                    <MenuItem value="3">3</MenuItem>
+                    <MenuItem value="4">4</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
             </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Memory (GB)</InputLabel>
-                <Select
-                  label="Memory"
-                  name="memory"
-                  value={memory}
-                  onChange={(e) => setMemory(e.target.value)}
-                >
-                  <MenuItem value="" disabled>
-                    <em>Select Memory</em>
-                  </MenuItem>
-                  <MenuItem value="8">8GB</MenuItem>
-                  <MenuItem value="16">16GB</MenuItem>
-                  <MenuItem value="32">32GB</MenuItem>
-                  <MenuItem value="64">64GB</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Cores</InputLabel>
-                <Select
-                  label="Cores"
-                  name="cores"
-                  value={cores}
-                  onChange={(e) => setCores(e.target.value)}
-                >
-                  <MenuItem value="" disabled>
-                    <em>Select Cores</em>
-                  </MenuItem>
-                  <MenuItem value="4">4</MenuItem>
-                  <MenuItem value="8">8</MenuItem>
-                  <MenuItem value="16">16</MenuItem>
-                  <MenuItem value="32">32</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Sockets</InputLabel>
-                <Select
-                  label="Sockets"
-                  name="sockets"
-                  value={sockets}
-                  onChange={(e) => setSockets(e.target.value)}
-                >
-                  <MenuItem value="" disabled>
-                    <em>Select Sockets</em>
-                  </MenuItem>
-                  <MenuItem value="1">1</MenuItem>
-                  <MenuItem value="2">2</MenuItem>
-                  <MenuItem value="3">3</MenuItem>
-                  <MenuItem value="4">4</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </CardContent>
-        <Divider />
-        <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button type="submit" variant="contained">Save details</Button>
-        </CardActions>
-        {error && <Alert severity="error">{error}</Alert>}
-        {success && <Alert severity="success">{success}</Alert>}
-      </Card>
-    </form>
+          </CardContent>
+          <Divider />
+          <CardActions sx={{ justifyContent: 'flex-end' }}>
+            <Button type="submit" variant="contained">Save details</Button>
+          </CardActions>
+          {error && <Alert severity="error">{error}</Alert>}
+          {success && <Alert severity="success">{success}</Alert>}
+        </Card>
+      </form>
+    )}
+    </>
   );
 }
