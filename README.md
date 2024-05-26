@@ -9,7 +9,7 @@
 ## Pages 
 
 - [motherboard](https://material-kit-react.devias.io)
-- [Customers](https://material-kit-react.devias.io/motherboard/customers)
+- [summary](https://material-kit-react.devias.io/motherboard/summary)
 - [Integrations](https://material-kit-react.devias.io/motherboard/integrations)
 - [Settings](https://material-kit-react.devias.io/motherboard/settings)
 - [Account](https://material-kit-react.devias.io/motherboard/account)

@@ -15,25 +15,23 @@ import '@sendbird/uikit-react/dist/index.css';
 import dayjs from 'dayjs';
 
 import { config } from '@/config';
-import { CustomersFilters } from '@/components/motherboard/customers/customers-filters';
-import { CustomersTable } from '@/components/motherboard/customers/customers-table';
-import type { Customer } from '@/components/motherboard/customers/customers-table';
+import { SummaryFilters } from '@/components/motherboard/summary/summary-filters';
+import { SummaryTable } from '@/components/motherboard/summary/summary-table';
+import type { Summary } from '@/components/motherboard/summary/summary-table';
 
-export const metadata = { title: `Customers | motherboard | ${config.site.name}` } satisfies Metadata;
-
-
+export const metadata = { title: `summary | motherboard | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
   // const page = 0;
   // const rowsPerPage = 5;
 
-  // const paginatedCustomers = applyPagination(customers, page, rowsPerPage);
+  // const paginatedsummary = applyPagination(summary, page, rowsPerPage);
 
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Customers</Typography>
+          <Typography variant="h4">summary</Typography>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
               Import
@@ -49,14 +47,10 @@ export default function Page(): React.JSX.Element {
           </Button>
         </div>
       </Stack>
-      <CustomersFilters />
+      <SummaryFilters />
 
-      <CustomersTable
-        
-      />
+      <SummaryTable />
 
-      
     </Stack>
   );
 }
-

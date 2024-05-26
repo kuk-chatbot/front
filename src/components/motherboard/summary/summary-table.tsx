@@ -44,7 +44,7 @@ interface SummaryTableProps {
   rowsPerPage?: number;
 }
 
-export function CustomersTable({
+export function SummaryTable({
   count = 0,
   rows = [],
   page = 0,
@@ -74,7 +74,7 @@ export function CustomersTable({
       }
 
       try {
-        const response = await axios.get('http://localhost:8000/motherboard/customers', {
+        const response = await axios.get('http://localhost:8000/motherboard/summary', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -103,7 +103,7 @@ export function CustomersTable({
       }
 
       console.log(`Fetching image for ID: ${id}`);
-      const response = await axios.get(`http://localhost:8000/motherboard/customers/${id}`, {
+      const response = await axios.get(`http://localhost:8000/motherboard/summary/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -112,8 +112,8 @@ export function CustomersTable({
 
       if (response.status === 200) { // 응답 바디가 base64 문자열
         console.log(`Received image data: ${response.data}`);
-        setImageSrc(`data:image/;base64,${response.data}`);
-        console.log(`Set imageSrc: data:image/jpeg;base64,${response.dataa}`);
+        setImageSrc(`data:image/jpeg;base64,${response.data}`);
+        console.log(`Set imageSrc: data:image/jpeg;base64,${response.data}`);
         setOpen(true);
       } else {
         console.error('Failed to fetch image', response);

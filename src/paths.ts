@@ -4,7 +4,7 @@ export const paths = {
   motherboard: {
     overview: '/motherboard',
     account: '/motherboard/account',
-    customers: '/motherboard/customers',
+    summary: '/motherboard/summary',
     chatbot: '/motherboard/chatbot',
     settings: '/motherboard/settings',
   },
