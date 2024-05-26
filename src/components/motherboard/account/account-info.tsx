@@ -1,18 +1,18 @@
 'use client';
 
 import * as React from 'react';
-import axios from 'axios';
+import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
+import CircularProgress from '@mui/material/CircularProgress';
 import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
-import CircularProgress from '@mui/material/CircularProgress';
-import Grid from '@mui/material/Grid';
+import axios from 'axios';
 
 interface User {
   id: number;
@@ -41,10 +41,9 @@ export function AccountInfo(): React.JSX.Element {
       try {
         const response = await axios.get('http://localhost:8000/motherboard/account', {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
-
 
         if (response.status === 200) {
           setUser(response.data);
