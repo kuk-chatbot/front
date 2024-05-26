@@ -56,16 +56,16 @@ export function MainNav(): React.JSX.Element {
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
             <div>
-              master1 <img src="/activation_mark.png" width='12' height='12' alt='image'/>
+              master1 <img src="/activation_mark.png" width='18' height='18' alt=''/>
             </div>
             <div>
-              worker1 <img src="/activation_mark.png" width='12' height='12' alt='image'/>
+              worker1 <img src="/activation_mark.png" width='18' height='18' alt=''/>
             </div>
             <div>
-              worker2 <img src="/activation_mark.png" width='12' height='12' alt='image'/>
+              worker2 <img src="/activation_mark.png" width='18' height='18' alt=''/>
             </div>
             <div>
-              worker3 <img src="/activation_mark.png" width='12' height='12' alt='image'/>
+              worker3 <img src="/activation_mark.png" width='18' height='18' alt=''/>
             </div>
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
