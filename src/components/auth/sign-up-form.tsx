@@ -4,12 +4,10 @@ import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormLabel, MenuItem, Radio, RadioGroup, Select, Stack } from '@mui/material';
+import { MenuItem, Select, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
@@ -19,38 +17,40 @@ import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 
 import { paths } from '@/paths';
-import { authClient } from '@/lib/auth/client';
+import { authClient, SignUpParams } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 
 const schema = zod.object({
-  userName: zod.string().min(1, { message: 'User name is required' }),
+  username: zod.string().min(1, { message: 'User name is required' }),
   password: zod.string().min(6, { message: 'Password should be at least 6 characters' }),
+  name: zod.string().min(1, { message: 'Name is required' }),
   role: zod.string().min(1, { message: 'Role is required' }),
-  terms: zod.boolean().refine((value) => value, 'You must accept the terms and conditions'),
-  concurrentUserCount: zod.string().min(1, { message: 'input number!' }),
-  availableRAM: zod.string().min(1, { message: 'check' }),
-  cpuType: zod.string().min(1, { message: 'check' }),
-  cpuCount: zod.string().min(1, { message: 'check' }),
+  userlimit: zod.number().optional(),
+  memory: zod.number().optional(),
+  cores: zod.number().optional(),
+  sockets: zod.number().optional(),
+  chatbotModel: zod.string().optional(),
+  imageSolution: zod.string().optional(),
 });
 
 type Values = zod.infer<typeof schema>;
 
 const defaultValues = {
-  userName: '',
+  username: '',
   password: '',
-  role: '',
-  terms: false,
-  concurrentUserCount: '',
-  availableRAM: '',
-  cpuType: '',
-  cpuCount: '',
+  name: '',
+  role: 'PERSONAL',
+  userlimit: 0,
+  memory: 0,
+  cores: 0,
+  sockets: 0,
+  chatbotModel: '',
+  imageSolution: '',
 } satisfies Values;
 
 export function SignUpForm(): React.JSX.Element {
   const router = useRouter();
-
   const { checkSession } = useUser();
-
   const [isPending, setIsPending] = React.useState<boolean>(false);
 
   const {
@@ -65,7 +65,14 @@ export function SignUpForm(): React.JSX.Element {
     async (values: Values): Promise<void> => {
       setIsPending(true);
 
-      const { error } = await authClient.signUp(values);
+      const { role, username, name, password, userlimit, memory, cores, sockets } = values;
+      let signUpParams: Partial<SignUpParams> = { role, username, name, password };
+
+      if (role === 'ENTERPRISE') {
+        signUpParams = { ...signUpParams, userlimit, memory, cores, sockets };
+      }
+
+      const { error } = await authClient.signUp(signUpParams as SignUpParams);
 
       if (error) {
         setError('root', { type: 'server', message: error });
@@ -73,12 +80,7 @@ export function SignUpForm(): React.JSX.Element {
         return;
       }
 
-      // Refresh the auth state
-      await checkSession?.();
-
-      // UserProvider, for this case, will not refresh the router
-      // After refresh, GuestGuard will handle the redirect
-      router.refresh();
+      router.push(paths.auth.signIn);
     },
     [checkSession, router, setError]
   );
@@ -100,12 +102,12 @@ export function SignUpForm(): React.JSX.Element {
         <Stack spacing={2}>
           <Controller
             control={control}
-            name="userName"
+            name="username"
             render={({ field }) => (
-              <FormControl error={Boolean(errors.userName)}>
+              <FormControl error={Boolean(errors.username)}>
                 <InputLabel>User Name</InputLabel>
                 <OutlinedInput {...field} label="User Name" />
-                {errors.userName ? <FormHelperText>{errors.userName.message}</FormHelperText> : null}
+                {errors.username ? <FormHelperText>{errors.username.message}</FormHelperText> : null}
               </FormControl>
             )}
           />
@@ -122,111 +124,166 @@ export function SignUpForm(): React.JSX.Element {
           />
           <Controller
             control={control}
+            name="name"
+            render={({ field }) => (
+              <FormControl error={Boolean(errors.name)}>
+                <InputLabel>Name</InputLabel>
+                <OutlinedInput {...field} label="Name" />
+                {errors.name ? <FormHelperText>{errors.name.message}</FormHelperText> : null}
+              </FormControl>
+            )}
+          />
+          <Controller
+            control={control}
             name="role"
             render={({ field }) => (
               <FormControl>
                 <InputLabel>Role</InputLabel>
                 <Select {...field} label="Role">
-                  <MenuItem value="personal">Personal</MenuItem>
-                  <MenuItem value="enterprise">Enterprise</MenuItem>
+                  <MenuItem value="PERSONAL">PERSONAL</MenuItem>
+                  <MenuItem value="ENTERPRISE">ENTERPRISE</MenuItem>
                 </Select>
               </FormControl>
             )}
           />
-          {role === 'enterprise' && (
+          {role === 'ENTERPRISE' && (
             <Stack spacing={2}>
               <Typography color="text.secondary" variant="body2">
                 Design your service performance
               </Typography>
               <Controller
                 control={control}
-                name="concurrentUserCount"
+                name="userlimit"
                 render={({ field }) => (
-                  <FormControl>
-                    <InputLabel>동시 사용자 수</InputLabel>
-                    <OutlinedInput {...field} type="number" label="동시 사용자 수" />
+                  <FormControl error={Boolean(errors.userlimit)}>
+                    <InputLabel>User Limit</InputLabel>
+                    <Select
+                      {...field}
+                      label="User Limit"
+                    >
+                      <MenuItem value="" disabled>
+                        <em>Select User Limit</em>
+                      </MenuItem>
+                      <MenuItem value={25}>25</MenuItem>
+                      <MenuItem value={50}>50</MenuItem>
+                      <MenuItem value={75}>75</MenuItem>
+                      <MenuItem value={100}>100</MenuItem>
+                    </Select>
+                    {errors.userlimit ? <FormHelperText>{errors.userlimit.message}</FormHelperText> : null}
                   </FormControl>
                 )}
               />
               <Controller
                 control={control}
-                name="availableRAM"
+                name="memory"
+                render={({ field }) => (
+                  <FormControl error={Boolean(errors.memory)}>
+                    <InputLabel>Memory</InputLabel>
+                    <Select
+                      {...field}
+                      label="Memory"
+                      displayEmpty
+                      renderValue={(selected) => (selected ? `${selected}GB` : '')}
+                      onChange={(event) => field.onChange(parseInt(event.target.value as string))}
+                    >
+                      <MenuItem value="" disabled>
+                        <em>Select Memory</em>
+                      </MenuItem>
+                      <MenuItem value={8}>8GB</MenuItem>
+                      <MenuItem value={16}>16GB</MenuItem>
+                      <MenuItem value={32}>32GB</MenuItem>
+                      <MenuItem value={64}>64GB</MenuItem>
+                    </Select>
+                    {errors.memory ? <FormHelperText>{errors.memory.message}</FormHelperText> : null}
+                  </FormControl>
+                )}
+              />
+              <Controller
+                control={control}
+                name="cores"
+                render={({ field }) => (
+                  <FormControl error={Boolean(errors.cores)}>
+                    <InputLabel>Cores</InputLabel>
+                    <Select
+                      {...field}
+                      label="Cores"
+                    >
+                      <MenuItem value="" disabled>
+                        <em>Select the number of cores</em>
+                      </MenuItem>
+                      <MenuItem value={4}>4</MenuItem>
+                      <MenuItem value={8}>8</MenuItem>
+                      <MenuItem value={16}>16</MenuItem>
+                      <MenuItem value={32}>32</MenuItem>
+                    </Select>
+                    {errors.cores ? <FormHelperText>{errors.cores.message}</FormHelperText> : null}
+                  </FormControl>
+                )}
+              />
+              <Controller
+                control={control}
+                name="sockets"
+                render={({ field }) => (
+                  <FormControl error={Boolean(errors.sockets)}>
+                    <InputLabel>Sockets</InputLabel>
+                    <Select
+                      {...field}
+                      label="Sockets"
+                    >
+                      <MenuItem value="" disabled>
+                        <em>Select the number of CPU</em>
+                      </MenuItem>
+                      <MenuItem value={1}>1</MenuItem>
+                      <MenuItem value={2}>2</MenuItem>
+                      <MenuItem value={3}>3</MenuItem>
+                      <MenuItem value={4}>4</MenuItem>
+                    </Select>
+                    {errors.sockets ? <FormHelperText>{errors.sockets.message}</FormHelperText> : null}
+                  </FormControl>
+                )}
+              />
+              <Controller
+                control={control}
+                name="chatbotModel"
                 render={({ field }) => (
                   <FormControl>
-                    <InputLabel>메모리</InputLabel>
-                    <Select {...field} label="메모리">
-                      <MenuItem value="1GiB">1 GiB 메모리</MenuItem>
-                      <MenuItem value="2GiB">2 GiB 메모리</MenuItem>
-                      <MenuItem value="4GiB">4 GiB 메모리</MenuItem>
-                      <MenuItem value="8GiB">8 GiB 메모리</MenuItem>
-                      <MenuItem value="16GiB">16 GiB 메모리</MenuItem>
-                      <MenuItem value="32GiB">32 GiB 메모리</MenuItem>
+                    <InputLabel>Chatbot Model</InputLabel>
+                    <Select {...field} label="Chatbot Model">
+                      <MenuItem value="gpt-4o">gpt-4o</MenuItem>
+                      <MenuItem value="gpt-4o">gpt-4</MenuItem>
+                      <MenuItem value="claude 2.1">claude 2.1</MenuItem>
+                      <MenuItem value="gemini pro">gemini ultra</MenuItem>
                     </Select>
                   </FormControl>
                 )}
               />
               <Controller
                 control={control}
-                name="cpuType"
+                name="imageSolution"
                 render={({ field }) => (
                   <FormControl>
-                    <FormLabel id="demo-radio-buttons-group-label">CPU 아키텍처</FormLabel>
-                    <RadioGroup
-                      row
-                      {...field}
-                      aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="64비트(x86)"
-                      name="radio-buttons-group"
-                    >
-                      <FormControlLabel value="64비트(x86)" control={<Radio />} label="64비트(x86)" />
-                      <FormControlLabel value="64비트(Arm)" control={<Radio />} label="64비트(Arm)" />
-                    </RadioGroup>
-                  </FormControl>
-                )}
-              />
-              <Controller
-                control={control}
-                name="cpuCount"
-                render={({ field }) => (
-                  <FormControl>
-                    <InputLabel>가상 CPU 수</InputLabel>
-                    <Select {...field} label="가상 CPU 수">
-                      <MenuItem value="1vCPU">1 vCPU</MenuItem>
-                      <MenuItem value="2vCPU">2 vCPU</MenuItem>
-                      <MenuItem value="4vCPU">4 vCPU</MenuItem>
-                      <MenuItem value="8vCPU">8 vCPU</MenuItem>
-                      <MenuItem value="16vCPU">16 vCPU</MenuItem>
+                    <InputLabel>Image Analyze</InputLabel>
+                    <Select {...field} label="Image solution">
+                    <MenuItem value="" disabled>
+                        <em>Select the Image Analyze Chatbot Solution</em>
+                      </MenuItem>
+                      <MenuItem value="메인보드 불량 검사">메인보드 불량 검사</MenuItem>
+                      <MenuItem value="휴대폰 화면 표면 결함 검사">휴대폰 화면 표면 결함 검사</MenuItem>
+                      <MenuItem value="반도체 웨이퍼 불량 검사">반도체 웨이퍼 불량 검사</MenuItem>
+                      <MenuItem value="옷 불량 검사">옷 불량 검사</MenuItem>
+                      <MenuItem value="기계 설비 불량 검사">기계 설비 불량 검사</MenuItem>
+                      <MenuItem value="차량 파손 여부 및 파손 부위 식별 검사">차량 파손 여부 및 파손 부위 식별 검사</MenuItem>
                     </Select>
                   </FormControl>
                 )}
               />
             </Stack>
           )}
-
-          <Controller
-            control={control}
-            name="terms"
-            render={({ field }) => (
-              <div>
-                <FormControlLabel
-                  control={<Checkbox {...field} />}
-                  label={
-                    <React.Fragment>
-                      I have read the <Link>terms and conditions</Link>
-                    </React.Fragment>
-                  }
-                />
-                {errors.terms ? <FormHelperText error>{errors.terms.message}</FormHelperText> : null}
-              </div>
-            )}
-          />
-          {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
           <Button disabled={isPending} type="submit" variant="contained">
             Sign up
           </Button>
         </Stack>
       </form>
-      <Alert color="warning">Created users are not persisted</Alert>
     </Stack>
   );
 }

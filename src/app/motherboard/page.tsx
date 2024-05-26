@@ -4,16 +4,16 @@ import Grid from '@mui/material/Unstable_Grid2';
 import dayjs from 'dayjs';
 
 import { config } from '@/config';
-import { Budget } from '@/components/dashboard/overview/budget';
-import { LatestOrders } from '@/components/dashboard/overview/latest-orders';
-import { LatestProducts } from '@/components/dashboard/overview/latest-products';
-import { Sales } from '@/components/dashboard/overview/sales';
-import { TasksProgress } from '@/components/dashboard/overview/tasks-progress';
-import { TotalCustomers } from '@/components/dashboard/overview/total-customers';
-import { TotalProfit } from '@/components/dashboard/overview/total-profit';
-import { Traffic } from '@/components/dashboard/overview/traffic';
+import { Budget } from '@/components/motherboard/overview/budget';
+import { LatestOrders } from '@/components/motherboard/overview/latest-orders';
+import { LatestProducts } from '@/components/motherboard/overview/latest-products';
+import { Sales } from '@/components/motherboard/overview/sales';
+import { TasksProgress } from '@/components/motherboard/overview/tasks-progress';
+import { Totalsummary } from '@/components/motherboard/overview/total-summary';
+import { TotalProfit } from '@/components/motherboard/overview/total-profit';
+import { Traffic } from '@/components/motherboard/overview/traffic';
 
-export const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Overview | motherboard | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
   return (
@@ -22,7 +22,7 @@ export default function Page(): React.JSX.Element {
         <Budget diff={12} trend="up" sx={{ height: '100%' }} value="$24k" />
       </Grid>
       <Grid lg={3} sm={6} xs={12}>
-        <TotalCustomers diff={16} trend="down" sx={{ height: '100%' }} value="1.6k" />
+        <Totalsummary diff={16} trend="down" sx={{ height: '100%' }} value="1.6k" />
       </Grid>
       <Grid lg={3} sm={6} xs={12}>
         <TasksProgress sx={{ height: '100%' }} value={75.5} />

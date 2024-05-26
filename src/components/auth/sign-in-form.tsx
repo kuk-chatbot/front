@@ -23,14 +23,14 @@ import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 
 const schema = zod.object({
-  userName: zod.string().min(1, { message: 'User Name is required' }),
+  username: zod.string().min(1, { message: 'User Name is required' }),
   password: zod.string().min(1, { message: 'Password is required' }),
   role: zod.string().min(1, { message: '' }), // Role field
 });
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { userName: 'hanyang', password: 'Secret1', role: 'Personal' } satisfies Values;
+const defaultValues = { username: 'hanyang', password: 'Secret1', role: 'Personal' } satisfies Values;
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter();
@@ -62,11 +62,11 @@ export function SignInForm(): React.JSX.Element {
 
       // Refresh the auth state
       await checkSession?.();
-
       // UserProvider, for this case, will not refresh the router
       // After refresh, GuestGuard will handle the redirect
-      router.refresh();
+      router.push(paths.motherboard.overview);
     },
+    
     [checkSession, router, setError]
   );
 
@@ -85,12 +85,12 @@ export function SignInForm(): React.JSX.Element {
         <Stack spacing={2}>
           <Controller
             control={control}
-            name="userName"
+            name="username"
             render={({ field }) => (
-              <FormControl error={Boolean(errors.userName)}>
+              <FormControl error={Boolean(errors.username)}>
                 <InputLabel>User Name</InputLabel>
                 <OutlinedInput {...field} label="User Name" />
-                {errors.userName ? <FormHelperText>{errors.userName.message}</FormHelperText> : null}
+                {errors.username ? <FormHelperText>{errors.username.message}</FormHelperText> : null}
               </FormControl>
             )}
           />
@@ -128,20 +128,6 @@ export function SignInForm(): React.JSX.Element {
               </FormControl>
             )}
           />
-          <Controller
-            control={control}
-            name="role"
-            defaultValue="personal"
-            render={({ field }) => (
-              <FormControl>
-                <InputLabel>Role</InputLabel>
-                <Select {...field} label="Role">
-                  <MenuItem value="personal">Personal</MenuItem>
-                  <MenuItem value="enterprise">Enterprise</MenuItem>
-                </Select>
-              </FormControl>
-            )}
-          />
           <div>
             <Link component={RouterLink} href={paths.auth.resetPassword} variant="subtitle2">
               Forgot password?
@@ -153,16 +139,6 @@ export function SignInForm(): React.JSX.Element {
           </Button>
         </Stack>
       </form>
-      <Alert color="warning">
-        Use{' '}
-        <Typography component="span" sx={{ fontWeight: 700 }} variant="inherit">
-          hanyang
-        </Typography>{' '}
-        with password{' '}
-        <Typography component="span" sx={{ fontWeight: 700 }} variant="inherit">
-          Secret1
-        </Typography>
-      </Alert>
     </Stack>
   );
 }

@@ -1,82 +1,117 @@
 'use client';
 
 import type { User } from '@/types/user';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
-function generateToken(): string {
-  const arr = new Uint8Array(12);
-  window.crypto.getRandomValues(arr);
-  return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
+export interface SignUpParams {
+  username: string;
+  name: string;
+  password: string;
+  role: string;
+  userlimit?: number;
+  memory?: number;
+  cores?: number;
+  sockets?: number;
 }
-
 const user = {
   avatar: '/assets/avatar.png',
   userName: 'hanyang',
   role: 'personal',
 } satisfies User;
 
-export interface SignUpParams {
-  userName: string;
-  password: string;
-  role: string;
-}
-
 export interface SignInWithOAuthParams {
   provider: 'google' | 'discord';
 }
 
 export interface SignInWithPasswordParams {
-  userName: string;
+  username: string;
   password: string;
 }
 
-export interface ResetPasswordParams {
-  userName: string;
+interface ErrorResponse {
+  message: string;
+}
+
+interface AuthResponse {
+  jwtToken: string;
 }
 
 class AuthClient {
-  async signUp(_: SignUpParams): Promise<{ error?: string }> {
-    // Make API request
+  async signUp(params: SignUpParams): Promise<{ error?: string }> {
+    try {
+      const response: AxiosResponse<unknown> = await axios.post('http://localhost:8000/auth/sign-up', params, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    // We do not handle the API, so we'll just generate a token and store it in localStorage.
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
+      
 
-    return {};
+      if (response.status !== 200) {
+        const errorData = response.data as ErrorResponse;
+        return { error: errorData.message || 'Something went wrong' };
+      }
+      
+      return {};
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return { error: axiosError.response?.data.message || 'Network error' };
+    }
   }
 
-  async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
-    return { error: 'Social authentication not implemented' };
+  private isErrorResponse(data: unknown): data is ErrorResponse {
+    return typeof data === 'object' && data !== null && 'message' in data;
+  }
+
+  private isAuthResponse(data: unknown): data is AuthResponse {
+    return typeof data === 'object' && data !== null && 'jwtToken' in data;
   }
 
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
-    const { userName, password } = params;
+    try {
+      const response: AxiosResponse<unknown> = await axios.post('http://localhost:8000/auth/sign-in', params, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    // Make API request
 
-    // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (userName !== 'hanyang' || password !== 'Secret1') {
-      return { error: 'Invalid credentials' };
+
+
+      if (response.status !== 200) {
+        const errorData = response.data as ErrorResponse;
+        return { error: errorData.message || 'Invalid credentials' };
+      }
+
+      const responseData = response.data as AuthResponse;
+
+
+
+      localStorage.setItem('custom-auth-token', responseData.jwtToken);
+      
+      return {};
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return { error: axiosError.response?.data.message || 'Network error' };
     }
-
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
-
-    return {};
   }
 
-  async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Password reset not implemented' };
-  }
-
-  async updatePassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Update reset not implemented' };
-  }
 
   async getUser(): Promise<{ data?: User | null; error?: string }> {
-    // Make API request
 
-    // We do not handle the API, so just check if we have a token in localStorage.
+
+
+
     const token = localStorage.getItem('custom-auth-token');
+
+
+
+    if (!token) {
+      return { data: null };
+    }
+
+
+    
 
     if (!token) {
       return { data: null };
@@ -87,7 +122,6 @@ class AuthClient {
 
   async signOut(): Promise<{ error?: string }> {
     localStorage.removeItem('custom-auth-token');
-
     return {};
   }
 }

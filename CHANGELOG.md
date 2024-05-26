@@ -78,7 +78,7 @@
 
 - Implement `jsconfig.json` file and removed `.env` to match React v16.8.6 absolute paths
 - Update chart styles and options
-- Update Dashboard view top widgets styles and structure
+- Update motherboard view top widgets styles and structure
 - Update few icons to match @material-ui v4 updates
 - Update React version to 16.8.6 to support React Hooks
 - Update to @material-ui to 4.0.0-beta

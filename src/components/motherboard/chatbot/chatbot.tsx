@@ -44,6 +44,28 @@ export function Chatbottable(): React.JSX.Element {
   const [currentChannelUrl, setCurrentChannelUrl] = React.useState<string | null>(null);
   useMessageHandler(currentChannelUrl); // 커스텀 훅 사용
 
+interface summaryTableProps {
+  count?: number;
+  page?: number;
+  rows?: Customer[];
+  rowsPerPage?: number;
+}
+
+export function summaryTable({
+  count = 0,
+  rows = [],
+  page = 0,
+  rowsPerPage = 0,
+}: summaryTableProps): React.JSX.Element {
+  const rowIds = React.useMemo(() => {
+    return rows.map((customer) => customer.id);
+  }, [rows]);
+
+  const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
+
+  const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
+  const selectedAll = rows.length > 0 && selected?.size === rows.length;
+
   return (
     <SendBirdProvider appId={APP_ID} userId={USER_ID}>
       <div className="app">
