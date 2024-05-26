@@ -55,6 +55,20 @@ export function MainNav(): React.JSX.Element {
             </Tooltip>
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
+            <div>
+              master1 <img src="/activation_mark.png" width='12' height='12' alt='image'/>
+            </div>
+            <div>
+              worker1 <img src="/activation_mark.png" width='12' height='12' alt='image'/>
+            </div>
+            <div>
+              worker2 <img src="/activation_mark.png" width='12' height='12' alt='image'/>
+            </div>
+            <div>
+              worker3 <img src="/activation_mark.png" width='12' height='12' alt='image'/>
+            </div>
+          </Stack>
+          <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
             <Tooltip title="Contacts">
               <IconButton>
                 <UsersIcon />
