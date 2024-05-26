@@ -10,15 +10,16 @@ import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Grid from '@mui/material/Unstable_Grid2';
 import Alert from '@mui/material/Alert';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 export function AccountDetailsForm(): React.JSX.Element {
-  const [userlimit, setUserlimit] = React.useState<number | string>('');
-  const [memory, setMemory] = React.useState<number | string>('');
-  const [cores, setCores] = React.useState<number | string>('');
-  const [sockets, setSockets] = React.useState<number | string>('');
+  const [userlimit, setUserlimit] = React.useState<string>('');
+  const [memory, setMemory] = React.useState<string>('');
+  const [cores, setCores] = React.useState<string>('');
+  const [sockets, setSockets] = React.useState<string>('');
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
 
@@ -53,6 +54,7 @@ export function AccountDetailsForm(): React.JSX.Element {
 
       if (response.status === 200) {
         setSuccess('Details updated successfully');
+        window.location.reload(); // 페이지 새로고침
       } else {
         setError('Failed to update details');
       }
@@ -71,49 +73,77 @@ export function AccountDetailsForm(): React.JSX.Element {
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>User Limit</InputLabel>
-                <OutlinedInput
+                <Select
                   label="User Limit"
                   name="userlimit"
-                  type="number"
                   value={userlimit}
                   onChange={(e) => setUserlimit(e.target.value)}
-                />
+                >
+                  <MenuItem value="" disabled>
+                    <em>Select User Limit</em>
+                  </MenuItem>
+                  <MenuItem value="25">25</MenuItem>
+                  <MenuItem value="50">50</MenuItem>
+                  <MenuItem value="75">75</MenuItem>
+                  <MenuItem value="100">100</MenuItem>
+                </Select>
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Memory (GB)</InputLabel>
-                <OutlinedInput
+                <Select
                   label="Memory"
                   name="memory"
-                  type="number"
                   value={memory}
                   onChange={(e) => setMemory(e.target.value)}
-                />
+                >
+                  <MenuItem value="" disabled>
+                    <em>Select Memory</em>
+                  </MenuItem>
+                  <MenuItem value="8">8GB</MenuItem>
+                  <MenuItem value="16">16GB</MenuItem>
+                  <MenuItem value="32">32GB</MenuItem>
+                  <MenuItem value="64">64GB</MenuItem>
+                </Select>
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Cores</InputLabel>
-                <OutlinedInput
+                <Select
                   label="Cores"
                   name="cores"
-                  type="number"
                   value={cores}
                   onChange={(e) => setCores(e.target.value)}
-                />
+                >
+                  <MenuItem value="" disabled>
+                    <em>Select Cores</em>
+                  </MenuItem>
+                  <MenuItem value="4">4</MenuItem>
+                  <MenuItem value="8">8</MenuItem>
+                  <MenuItem value="16">16</MenuItem>
+                  <MenuItem value="32">32</MenuItem>
+                </Select>
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Sockets</InputLabel>
-                <OutlinedInput
+                <Select
                   label="Sockets"
                   name="sockets"
-                  type="number"
                   value={sockets}
                   onChange={(e) => setSockets(e.target.value)}
-                />
+                >
+                  <MenuItem value="" disabled>
+                    <em>Select Sockets</em>
+                  </MenuItem>
+                  <MenuItem value="1">1</MenuItem>
+                  <MenuItem value="2">2</MenuItem>
+                  <MenuItem value="3">3</MenuItem>
+                  <MenuItem value="4">4</MenuItem>
+                </Select>
               </FormControl>
             </Grid>
           </Grid>
