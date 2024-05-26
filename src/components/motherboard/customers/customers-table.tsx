@@ -7,7 +7,6 @@ import Card from '@mui/material/Card';
 import Checkbox from '@mui/material/Checkbox';
 import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -103,19 +102,25 @@ export function CustomersTable({
         return;
       }
 
+      console.log(`Fetching image for ID: ${id}`);
       const response = await axios.get(`http://localhost:8000/motherboard/customers/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
+        responseType: 'text' // Ensure response is treated as text
       });
 
-      if (response.status === 200) {
-        setImageSrc(`data:image/png;base64,${response.data}`);
+      if (response.status === 200) { // 응답 바디가 base64 문자열
+        console.log(`Received image data: ${response.data}`);
+        setImageSrc(`data:image/;base64,${response.data}`);
+        console.log(`Set imageSrc: data:image/jpeg;base64,${response.dataa}`);
         setOpen(true);
       } else {
+        console.error('Failed to fetch image', response);
         setError('Failed to fetch image');
       }
     } catch (err) {
+      console.error('An error occurred while fetching image', err);
       setError('An error occurred while fetching image');
     }
   };
