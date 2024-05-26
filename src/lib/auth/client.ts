@@ -85,9 +85,6 @@ class AuthClient {
 
       const responseData = response.data as AuthResponse;
 
-      document.write(JSON.stringify(responseData));
-
-
 
 
       localStorage.setItem('custom-auth-token', responseData.jwtToken);
