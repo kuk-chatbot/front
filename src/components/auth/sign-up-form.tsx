@@ -7,9 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { MenuItem, Select, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-// import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
-// import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
@@ -27,10 +25,10 @@ const schema = zod.object({
   password: zod.string().min(6, { message: 'Password should be at least 6 characters' }),
   name: zod.string().min(1, { message: 'Name is required' }),
   role: zod.string().min(1, { message: 'Role is required' }),
-  userlimit: zod.preprocess((val) => val === '' ? undefined : Number(val), zod.number().optional()),
-  memory: zod.preprocess((val) => val === '' ? undefined : Number(val), zod.number().optional()),
-  cores: zod.preprocess((val) => val === '' ? undefined : Number(val), zod.number().optional()),
-  sockets: zod.preprocess((val) => val === '' ? undefined : Number(val), zod.number().optional()),
+  userlimit: zod.number().optional(),
+  memory: zod.number().optional(),
+  cores: zod.number().optional(),
+  sockets: zod.number().optional(),
 });
 
 type Values = zod.infer<typeof schema>;
@@ -155,7 +153,18 @@ export function SignUpForm(): React.JSX.Element {
                 render={({ field }) => (
                   <FormControl error={Boolean(errors.userlimit)}>
                     <InputLabel>User Limit</InputLabel>
-                    <OutlinedInput {...field} type="number" label="User Limit" />
+                    <Select
+                      {...field}
+                      label="User Limit"
+                    >
+                      <MenuItem value="" disabled>
+                    <em>Select Userlimit</em>
+                      </MenuItem>
+                      <MenuItem value={25}>25</MenuItem>
+                      <MenuItem value={50}>50</MenuItem>
+                      <MenuItem value={75}>75</MenuItem>
+                      <MenuItem value={100}>100</MenuItem>
+                    </Select>
                     {errors.userlimit ? <FormHelperText>{errors.userlimit.message}</FormHelperText> : null}
                   </FormControl>
                 )}
@@ -166,7 +175,21 @@ export function SignUpForm(): React.JSX.Element {
                 render={({ field }) => (
                   <FormControl error={Boolean(errors.memory)}>
                     <InputLabel>Memory</InputLabel>
-                    <OutlinedInput {...field} type="number" label="Memory" />
+                    <Select
+                      {...field}
+                      label="Memory"
+                      displayEmpty
+                      renderValue={(selected) => (selected ? `${selected}GB` : '')}
+                      onChange={(event) => field.onChange(parseInt(event.target.value as string))}
+                    >
+                      <MenuItem value="" disabled>
+                        <em>Select Memory</em>
+                      </MenuItem>
+                      <MenuItem value={8}>8GB</MenuItem>
+                      <MenuItem value={16}>16GB</MenuItem>
+                      <MenuItem value={32}>32GB</MenuItem>
+                      <MenuItem value={64}>64GB</MenuItem>
+                    </Select>
                     {errors.memory ? <FormHelperText>{errors.memory.message}</FormHelperText> : null}
                   </FormControl>
                 )}
@@ -177,7 +200,18 @@ export function SignUpForm(): React.JSX.Element {
                 render={({ field }) => (
                   <FormControl error={Boolean(errors.cores)}>
                     <InputLabel>Cores</InputLabel>
-                    <OutlinedInput {...field} type="number" label="Cores" />
+                    <Select
+                      {...field}
+                      label="Cores"
+                    >
+                      <MenuItem value="" disabled>
+                      <em>Select the number of cores</em>
+                      </MenuItem>
+                      <MenuItem value={4}>4</MenuItem>
+                      <MenuItem value={8}>8</MenuItem>
+                      <MenuItem value={16}>16</MenuItem>
+                      <MenuItem value={32}>32</MenuItem>
+                    </Select>
                     {errors.cores ? <FormHelperText>{errors.cores.message}</FormHelperText> : null}
                   </FormControl>
                 )}
@@ -188,37 +222,29 @@ export function SignUpForm(): React.JSX.Element {
                 render={({ field }) => (
                   <FormControl error={Boolean(errors.sockets)}>
                     <InputLabel>Sockets</InputLabel>
-                    <OutlinedInput {...field} type="number" label="Sockets" />
+                    <Select
+                      {...field}
+                      label="Sockets"
+                    >
+                      <MenuItem value="" disabled>
+                      <em>Select the number of CPU</em>
+                      </MenuItem>
+                      <MenuItem value={1}>1</MenuItem>
+                      <MenuItem value={2}>2</MenuItem>
+                      <MenuItem value={3}>3</MenuItem>
+                      <MenuItem value={4}>4</MenuItem>
+                    </Select>
                     {errors.sockets ? <FormHelperText>{errors.sockets.message}</FormHelperText> : null}
                   </FormControl>
                 )}
               />
             </Stack>
           )}
-          {/* <Controller
-            control={control}
-            name="terms"
-            render={({ field }) => (
-              <div>
-                <FormControlLabel
-                  control={<Checkbox {...field} />}
-                  label={
-                    <React.Fragment>
-                      I have read the <Link>terms and conditions</Link>
-                    </React.Fragment>
-                  }
-                />
-                {errors.terms ? <FormHelperText error>{errors.terms.message}</FormHelperText> : null}
-              </div>
-            )}
-          />
-          {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null} */}
           <Button disabled={isPending} type="submit" variant="contained">
             Sign up
           </Button>
         </Stack>
       </form>
-      <Alert color="warning">Created users are not persisted</Alert>
     </Stack>
   );
 }
