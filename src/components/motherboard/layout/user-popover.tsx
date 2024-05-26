@@ -1,4 +1,5 @@
 import * as React from 'react';
+import axios from 'axios';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
@@ -8,6 +9,8 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
 import { GearSix as GearSixIcon } from '@phosphor-icons/react/dist/ssr/GearSix';
 import { SignOut as SignOutIcon } from '@phosphor-icons/react/dist/ssr/SignOut';
 import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
@@ -23,10 +26,24 @@ export interface UserPopoverProps {
   open: boolean;
 }
 
+interface User {
+  id: number;
+  username: string;
+  name: string;
+  role: string;
+  userlimit?: number;
+  memory?: number;
+  cores?: number;
+  sockets?: number;
+}
+
 export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): React.JSX.Element {
   const { checkSession } = useUser();
 
   const router = useRouter();
+
+  const [user, setUser] = React.useState<User | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   const handleSignOut = React.useCallback(async (): Promise<void> => {
     try {
@@ -48,6 +65,44 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
     }
   }, [checkSession, router]);
 
+  React.useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem('custom-auth-token');
+
+      if (!token) {
+        setError('No token found');
+        return;
+      }
+
+      try {
+        const response = await axios.get('http://localhost:8000/motherboard/account', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+
+        if (response.status === 200) {
+          setUser(response.data);
+        } else {
+          setError('Failed to fetch user data');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching user data');
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  if (error) {
+    return <Alert severity="error">{error}</Alert>;
+  }
+
+  if (!user) {
+    return <CircularProgress />;
+  }
+
   return (
     <Popover
       anchorEl={anchorEl}
@@ -57,25 +112,13 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
       slotProps={{ paper: { sx: { width: '240px' } } }}
     >
       <Box sx={{ p: '16px 20px ' }}>
-        <Typography variant="subtitle1">Sofia Rivers</Typography>
+        <Typography variant="subtitle1">{user.name}</Typography>
         <Typography color="text.secondary" variant="body2">
-          sofia.rivers@devias.io
+          Role: {user.role}
         </Typography>
       </Box>
       <Divider />
       <MenuList disablePadding sx={{ p: '8px', '& .MuiMenuItem-root': { borderRadius: 1 } }}>
-        <MenuItem component={RouterLink} href={paths.motherboard.settings} onClick={onClose}>
-          <ListItemIcon>
-            <GearSixIcon fontSize="var(--icon-fontSize-md)" />
-          </ListItemIcon>
-          Settings
-        </MenuItem>
-        <MenuItem component={RouterLink} href={paths.motherboard.account} onClick={onClose}>
-          <ListItemIcon>
-            <UserIcon fontSize="var(--icon-fontSize-md)" />
-          </ListItemIcon>
-          Profile
-        </MenuItem>
         <MenuItem onClick={handleSignOut}>
           <ListItemIcon>
             <SignOutIcon fontSize="var(--icon-fontSize-md)" />
