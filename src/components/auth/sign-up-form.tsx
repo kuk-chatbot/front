@@ -29,6 +29,8 @@ const schema = zod.object({
   memory: zod.number().optional(),
   cores: zod.number().optional(),
   sockets: zod.number().optional(),
+  chatbotModel: zod.string().optional(),
+  imageSolution: zod.string().optional(),
 });
 
 type Values = zod.infer<typeof schema>;
@@ -42,6 +44,8 @@ const defaultValues = {
   memory: 0,
   cores: 0,
   sockets: 0,
+  chatbotModel: '',
+  imageSolution: '',
 } satisfies Values;
 
 export function SignUpForm(): React.JSX.Element {
@@ -158,7 +162,7 @@ export function SignUpForm(): React.JSX.Element {
                       label="User Limit"
                     >
                       <MenuItem value="" disabled>
-                    <em>Select Userlimit</em>
+                        <em>Select User Limit</em>
                       </MenuItem>
                       <MenuItem value={25}>25</MenuItem>
                       <MenuItem value={50}>50</MenuItem>
@@ -205,7 +209,7 @@ export function SignUpForm(): React.JSX.Element {
                       label="Cores"
                     >
                       <MenuItem value="" disabled>
-                      <em>Select the number of cores</em>
+                        <em>Select the number of cores</em>
                       </MenuItem>
                       <MenuItem value={4}>4</MenuItem>
                       <MenuItem value={8}>8</MenuItem>
@@ -227,7 +231,7 @@ export function SignUpForm(): React.JSX.Element {
                       label="Sockets"
                     >
                       <MenuItem value="" disabled>
-                      <em>Select the number of CPU</em>
+                        <em>Select the number of CPU</em>
                       </MenuItem>
                       <MenuItem value={1}>1</MenuItem>
                       <MenuItem value={2}>2</MenuItem>
@@ -235,6 +239,41 @@ export function SignUpForm(): React.JSX.Element {
                       <MenuItem value={4}>4</MenuItem>
                     </Select>
                     {errors.sockets ? <FormHelperText>{errors.sockets.message}</FormHelperText> : null}
+                  </FormControl>
+                )}
+              />
+              <Controller
+                control={control}
+                name="chatbotModel"
+                render={({ field }) => (
+                  <FormControl>
+                    <InputLabel>Chatbot Model</InputLabel>
+                    <Select {...field} label="Chatbot Model">
+                      <MenuItem value="gpt-4o">gpt-4o</MenuItem>
+                      <MenuItem value="gpt-4o">gpt-4</MenuItem>
+                      <MenuItem value="claude 2.1">claude 2.1</MenuItem>
+                      <MenuItem value="gemini pro">gemini ultra</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
+              <Controller
+                control={control}
+                name="imageSolution"
+                render={({ field }) => (
+                  <FormControl>
+                    <InputLabel>Image Analyze</InputLabel>
+                    <Select {...field} label="Image solution">
+                    <MenuItem value="" disabled>
+                        <em>Select the Image Analyze Chatbot Solution</em>
+                      </MenuItem>
+                      <MenuItem value="메인보드 불량 검사">메인보드 불량 검사</MenuItem>
+                      <MenuItem value="휴대폰 화면 표면 결함 검사">휴대폰 화면 표면 결함 검사</MenuItem>
+                      <MenuItem value="반도체 웨이퍼 불량 검사">반도체 웨이퍼 불량 검사</MenuItem>
+                      <MenuItem value="옷 불량 검사">옷 불량 검사</MenuItem>
+                      <MenuItem value="기계 설비 불량 검사">기계 설비 불량 검사</MenuItem>
+                      <MenuItem value="차량 파손 여부 및 파손 부위 식별 검사">차량 파손 여부 및 파손 부위 식별 검사</MenuItem>
+                    </Select>
                   </FormControl>
                 )}
               />
