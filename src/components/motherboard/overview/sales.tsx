@@ -31,7 +31,7 @@ export function Sales({ chartSeries, sx }: SalesProps): React.JSX.Element {
             Sync
           </Button>
         }
-        title="Sales"
+        title="Fault Report"
       />
       <CardContent>
         <Chart height={350} options={chartOptions} series={chartSeries} type="bar" width="100%" />
@@ -51,7 +51,7 @@ function useChartOptions(): ApexOptions {
 
   return {
     chart: { background: 'transparent', stacked: false, toolbar: { show: false } },
-    colors: [theme.palette.primary.main, alpha(theme.palette.primary.main, 0.25)],
+    colors: [theme.palette.primary.main],
     dataLabels: { enabled: false },
     fill: { opacity: 1, type: 'solid' },
     grid: {
@@ -67,15 +67,31 @@ function useChartOptions(): ApexOptions {
     xaxis: {
       axisBorder: { color: theme.palette.divider, show: true },
       axisTicks: { color: theme.palette.divider, show: true },
-      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      categories: [
+        'cpuFanNoScrews', 'cpuFan', 'cpuFanPort', 'cpuFanPortDetached', 'cpuFanScrewsLoose', 
+        'cpuFanScrews', 'looseScrews', 'noScrews', 'scratch', 'screws', 'incorrectScrews'
+      ],
       labels: { offsetY: 5, style: { colors: theme.palette.text.secondary } },
     },
     yaxis: {
       labels: {
-        formatter: (value) => (value > 0 ? `${value}K` : `${value}`),
+        formatter: (value) => (value > 0 ? `${value}` : `${value}`),
         offsetX: -10,
         style: { colors: theme.palette.text.secondary },
       },
     },
   };
 }
+
+// 사용 예시
+const exampleUsage = () => (
+  <Sales
+    chartSeries={[
+      {
+        name: 'Fault Count',
+        data: [10, 20, 15, 30, 25, 10, 5, 15, 10, 20, 25],
+      },
+    ]}
+    sx={{ margin: '20px' }}
+  />
+);
