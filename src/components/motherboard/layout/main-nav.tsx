@@ -56,7 +56,7 @@ export function MainNav(): React.JSX.Element {
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
             <div>
-              master1 <img src="/activation_mark.png" width='18' height='18' alt=''/>
+              master <img src="/activation_mark.png" width='18' height='18' alt=''/>
             </div>
             <div>
               worker1 <img src="/activation_mark.png" width='18' height='18' alt=''/>
@@ -65,7 +65,7 @@ export function MainNav(): React.JSX.Element {
               worker2 <img src="/activation_mark.png" width='18' height='18' alt=''/>
             </div>
             <div>
-              worker3 <img src="/activation_mark.png" width='18' height='18' alt=''/>
+              worker3 <img src="/deactivation_mark.png" width='18' height='18' alt=''/>
             </div>
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
