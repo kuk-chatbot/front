@@ -7,7 +7,7 @@ export const personalNavItems: NavItemConfig[] = [
 ];
 
 export const enterpriseNavItems: NavItemConfig[] = [
-  { key: 'motherboard', title: 'Motherboard', href: '/motherboard', icon: 'gear-six' },
+  { key: 'motherboard', title: 'Dashboard', href: '/motherboard', icon: 'gear-six' },
   { key: 'summary', title: 'Summary', href: '/motherboard/summary', icon: 'chart-pie' },
   { key: 'account', title: 'Account', href: '/motherboard/account', icon: 'user' },
 ];
