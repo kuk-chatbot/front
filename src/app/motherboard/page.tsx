@@ -12,6 +12,7 @@ import { TasksProgress } from '@/components/motherboard/overview/tasks-progress'
 import { Totalsummary } from '@/components/motherboard/overview/total-summary';
 import { TotalProfit } from '@/components/motherboard/overview/total-profit';
 import { Traffic } from '@/components/motherboard/overview/traffic';
+import { ChatbotTable } from '@/components/chatbot/chatbot';
 
 export default function Page(): React.JSX.Element | null {
   const { userType, isLoading, error } = useUserType();
@@ -26,7 +27,7 @@ export default function Page(): React.JSX.Element | null {
 
   return (
     <Container maxWidth="xl" sx={{ py: '64px' }}>
-      {userType === 'ENTERPRISE' && (
+      {userType === 'ENTERPRISE' ? (
         <Grid container spacing={3}>
           <Grid lg={3} sm={6} xs={12}>
             <Budget diff={12} trend="up" sx={{ height: '100%' }} value="148" />
@@ -52,8 +53,9 @@ export default function Page(): React.JSX.Element | null {
             <Traffic chartSeries={[63, 15, 22]} labels={['KUK-001', 'KUK-002', 'KUK-003']} sx={{ height: '100%' }} />
           </Grid>
         </Grid>
+      ) : (
+        <ChatbotTable />
       )}
-      {/* 여기에 PERSONAL 및 ENTERPRISE 공통으로 보여줄 내용 추가 */}
     </Container>
   );
 }
