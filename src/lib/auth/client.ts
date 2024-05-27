@@ -45,8 +45,6 @@ class AuthClient {
         },
       });
 
-      
-
       if (response.status !== 200) {
         const errorData = response.data as ErrorResponse;
         return { error: errorData.message || 'Something went wrong' };
@@ -59,14 +57,6 @@ class AuthClient {
     }
   }
 
-  private isErrorResponse(data: unknown): data is ErrorResponse {
-    return typeof data === 'object' && data !== null && 'message' in data;
-  }
-
-  private isAuthResponse(data: unknown): data is AuthResponse {
-    return typeof data === 'object' && data !== null && 'jwtToken' in data;
-  }
-
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
     try {
       const response: AxiosResponse<unknown> = await axios.post('http://localhost:8000/auth/sign-in', params, {
@@ -75,18 +65,12 @@ class AuthClient {
         },
       });
 
-
-
-
       if (response.status !== 200) {
         const errorData = response.data as ErrorResponse;
         return { error: errorData.message || 'Invalid credentials' };
       }
 
       const responseData = response.data as AuthResponse;
-
-
-
       localStorage.setItem('custom-auth-token', responseData.jwtToken);
       
       return {};
@@ -96,28 +80,31 @@ class AuthClient {
     }
   }
 
-
   async getUser(): Promise<{ data?: User | null; error?: string }> {
-
-
-
-
     const token = localStorage.getItem('custom-auth-token');
 
-
-
     if (!token) {
       return { data: null };
     }
 
+    try {
+      const response: AxiosResponse<unknown> = await axios.get('http://localhost:8000/auth/user', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
 
-    
+      if (response.status !== 200) {
+        const errorData = response.data as ErrorResponse;
+        return { error: errorData.message || 'Something went wrong' };
+      }
 
-    if (!token) {
-      return { data: null };
+      const userRole = response.data as string;
+      return { data: { ...user, role: userRole } };
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return { error: axiosError.response?.data.message || 'Network error' };
     }
-
-    return { data: user };
   }
 
   async signOut(): Promise<{ error?: string }> {
@@ -127,3 +114,4 @@ class AuthClient {
 }
 
 export const authClient = new AuthClient();
+
