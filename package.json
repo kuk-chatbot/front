@@ -30,6 +30,8 @@
     "@mui/utils": "5.15.12",
     "@mui/x-date-pickers": "6.19.6",
     "@phosphor-icons/react": "2.0.15",
+    "@sendbird/chat": "^4.12.6",
+    "@sendbird/chat-ai-widget": "^1.5.12",
     "@sendbird/uikit-react": "^3.14.6",
     "apexcharts": "3.46.0",
     "axios": "^1.7.2",
