@@ -40,12 +40,30 @@ const useSendBird = () => {
 
   const proxyImageUrl = (imageUrl: string) =>
     `http://kuk.solution:8000/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
+  const getFileExtension = (fileName: string) => {
+    return fileName.split('.').pop()?.toLowerCase();
+  };
+
+  const getMimeType = (extension: string) => {
+    switch (extension) {
+      case 'jpeg':
+      case 'jpg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      default:
+        return 'image/jpeg'; // 기본 MIME 타입
+    }
+  };
 
   const urlToFile = async (url: string): Promise<File> => {
     const response = await fetch(proxyImageUrl(url));
     const blob = await response.blob();
-    const mimeType = blob.type; // 기본 MIME 타입 설정
+
     const fileName = url.split('/').pop()?.split('?')[0] || 'image.jpg'; // URL에서 파일 이름 추출
+    const fileExtension = getFileExtension(fileName);
+    const mimeType = getMimeType(fileExtension || '');
+
     return new File([blob], fileName, { type: mimeType });
   };
 
@@ -82,10 +100,11 @@ const useSendBird = () => {
           console.log(file);
           const data = new FormData();
           data.append('image', file);
-          data.append('modelName', modelName ?? 'KUK001');
-          data.append('cause', cause ?? '컴퓨터가 안켜져요');
+          data.append('modelName', modelName ?? 'dafault');
+          data.append('cause', cause ?? 'default');
 
           // 데이터 확인
+          console.log(data);
           data.forEach((value, key) => {
             console.log(`${key}: ${value}`);
           });
