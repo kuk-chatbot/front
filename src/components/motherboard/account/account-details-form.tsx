@@ -51,7 +51,7 @@ export function AccountDetailsForm(): React.JSX.Element {
 
     try {
       const response = await axios.put(
-        'http://localhost:8000/motherboard/account',
+        'http://kuk.solution:8000/motherboard/account',
         {
           userlimit: Number(userlimit),
           memory: Number(memory),
@@ -87,7 +87,7 @@ export function AccountDetailsForm(): React.JSX.Element {
       }
 
       try {
-        const response = await axios.get('http://localhost:8000/motherboard/account', {
+        const response = await axios.get('http://kuk.solution:8000/motherboard/account', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

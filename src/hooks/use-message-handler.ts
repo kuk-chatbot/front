@@ -36,12 +36,13 @@ const useSendBird = () => {
     });
   }, []);
 
-  const proxyImageUrl = (imageUrl: string) =>
-    `http://localhost:8000/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
-
   const urlToFile = async (url: string, filename: string, mimeType: string): Promise<File> => {
-    const response = await fetch(proxyImageUrl(url));
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
     const blob = await response.blob();
+    console.log('Blob size:', blob.size);
     return new File([blob], filename, { type: mimeType });
   };
 
@@ -61,6 +62,8 @@ const useSendBird = () => {
         console.log('Received file message:', fileMessage.url);
         try {
           const file = await urlToFile(fileMessage.url, 'image.jpg', 'image/jpeg');
+          console.log('File created:', file);
+
           const data = new FormData();
           data.append('image', file);
           data.append('modelName', modelName ?? 'KUK001');
@@ -74,7 +77,7 @@ const useSendBird = () => {
           const jwtToken = localStorage.getItem('custom-auth-token'); // 로컬 스토리지에서 JWT 토큰 가져오기
 
           axios
-            .post('http://localhost:8000/motherboard/upload', data, {
+            .post('http://kuk.solution:8000/motherboard/upload', data, {
               headers: {
                 Authorization: `Bearer ${jwtToken}`,
                 'Content-Type': 'multipart/form-data',

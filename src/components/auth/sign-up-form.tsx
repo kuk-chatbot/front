@@ -250,7 +250,7 @@ export function SignUpForm(): React.JSX.Element {
                     <InputLabel>Chatbot Model</InputLabel>
                     <Select {...field} label="Chatbot Model">
                       <MenuItem value="gpt-4o">gpt-4o</MenuItem>
-                      <MenuItem value="gpt-4o">gpt-4</MenuItem>
+                      <MenuItem value="gpt-4">gpt-4</MenuItem>
                       <MenuItem value="claude 2.1">claude 2.1</MenuItem>
                       <MenuItem value="gemini pro">gemini ultra</MenuItem>
                     </Select>
