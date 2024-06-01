@@ -38,33 +38,24 @@ const useSendBird = () => {
     });
   }, []);
 
-  const proxyImageUrl = (imageUrl: string) =>
-    `http://kuk.solution:8000/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
-  const getFileExtension = (fileName: string) => {
-    return fileName.split('.').pop()?.toLowerCase();
-  };
-
-  const getMimeType = (extension: string) => {
-    switch (extension) {
-      case 'jpeg':
-      case 'jpg':
-        return 'image/jpeg';
-      case 'png':
-        return 'image/png';
-      default:
-        return 'image/jpeg'; // 기본 MIME 타입
+  const urlToFile = async (url: string): Promise<File | null> => {
+    console.log('Fetching image from URL:', url);
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error('Failed to fetch image:', response.statusText);
+      return null;
     }
-  };
-
-  const urlToFile = async (url: string): Promise<File> => {
-    const response = await fetch(proxyImageUrl(url));
     const blob = await response.blob();
-
-    const fileName = url.split('/').pop()?.split('?')[0] || 'image.jpg'; // URL에서 파일 이름 추출
-    const fileExtension = getFileExtension(fileName);
-    const mimeType = getMimeType(fileExtension || '');
-
-    return new File([blob], fileName, { type: mimeType });
+    if (blob.size === 0) {
+      console.error('Fetched image is empty.');
+      return null;
+    }
+    const mimeType = blob.type;
+    console.log('Fetched blob type:', mimeType);
+    const fileName = url.split('/').pop()?.split('?')[0] || 'image.jpg';
+    const file = new File([blob], fileName, { type: mimeType });
+    console.log('File created:', file);
+    return file;
   };
 
   useEffect(() => {
@@ -77,42 +68,44 @@ const useSendBird = () => {
       if (message.messageType === 'user' && message.sender && message.sender.userId !== CHATBOT_USER_ID) {
         const userMessage = message.message;
         console.log('Received text message:', userMessage);
-        // "증상 ~" 또는 "모델명 ~" 패턴을 찾음
         const causeMatch = userMessage?.match(/증상:\s*([^,]+)/);
         const modelNameMatch = userMessage?.match(/모델명:\s*([^,]+)/);
 
         if (causeMatch) {
-          console.log(causeMatch);
+          console.log('Cause matched:', causeMatch);
           setCause(causeMatch[1].trim());
         }
         if (modelNameMatch) {
-          console.log(modelName);
+          console.log('Model name matched:', modelNameMatch);
           setModelName(modelNameMatch[1].trim());
         }
       } else if (message.messageType === 'file' && message.sender && message.sender.userId !== CHATBOT_USER_ID) {
-        // 파일 메시지
         const fileMessage = message;
         console.log('Received file message:', fileMessage.url);
         try {
-          setLoading(true); // 로딩 시작
-          const startTime = Date.now(); // 시작 시간 기록
+          setLoading(true);
+          const startTime = Date.now();
           const file = await urlToFile(fileMessage.url);
-          console.log(file);
-          const data = new FormData();
-          data.append('image', file);
-          data.append('modelName', modelName ?? 'dafault');
-          data.append('cause', cause ?? 'default');
+          if (!file) {
+            console.error('Failed to convert URL to file');
+            setLoading(false);
+            return;
+          }
+          console.log('File to be sent to server:', file);
+          const formData = new FormData();
+          formData.append('image', file);
 
-          // 데이터 확인
-          console.log(data);
-          data.forEach((value, key) => {
-            console.log(`${key}: ${value}`);
+          // JSON 데이터를 문자열로 변환하여 FormData에 추가
+          const jsonData = JSON.stringify({
+            modelName: modelName ?? 'KUK001',
+            cause: cause ?? '컴퓨터가 안켜져요'
           });
+          formData.append('jsonData', new Blob([jsonData], { type: 'application/json' }));
 
           const jwtToken = localStorage.getItem('custom-auth-token'); // 로컬 스토리지에서 JWT 토큰 가져오기
 
           axios
-            .post('http://kuk.solution:8000/motherboard/upload', data, {
+            .post('http://kuk.solution:8000/motherboard/upload', formData, {
               headers: {
                 Authorization: `Bearer ${jwtToken}`,
                 'Content-Type': 'multipart/form-data',
@@ -120,7 +113,8 @@ const useSendBird = () => {
             })
             .then((response) => {
               const answerData = response.data;
-              // answerData 객체를 문자열로 변환하여 Sendbird 메시지로 설정
+              console.log('Server response:', answerData);
+
               setAnswer({
                 message: `CPU Fan No Screws: ${answerData.cpuFanNoScrews || 0}<br> 
                 CPU Fan Port Detached: ${answerData.cpuFanPortDetached || 0}<br> 
@@ -131,6 +125,7 @@ const useSendBird = () => {
                 Scratch: ${answerData.scratch || 0}<br>`,
                 resultImage: `data:image/jpeg;base64,${answerData.resultImage}`, // Ensure it's base64 encoded
               });
+
               const elapsedTime = Date.now() - startTime;
               const remainingTime = Math.max(3000 - elapsedTime, 0); // 최소 3초 보장
               setTimeout(() => {
@@ -138,7 +133,7 @@ const useSendBird = () => {
               }, remainingTime);
             })
             .catch((error) => {
-              console.error('Error sending file to server:', error);
+              console.error('Error sending file or metadata to server:', error);
               setLoading(false); // 로딩 종료
             });
         } catch (error) {
