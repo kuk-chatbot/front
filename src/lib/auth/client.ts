@@ -39,7 +39,7 @@ interface AuthResponse {
 class AuthClient {
   async signUp(params: SignUpParams): Promise<{ error?: string }> {
     try {
-      const response: AxiosResponse<unknown> = await axios.post('http://localhost:8000/auth/sign-up', params, {
+      const response: AxiosResponse<unknown> = await axios.post('http://kuk.solution:8000/auth/sign-up', params, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -59,7 +59,7 @@ class AuthClient {
 
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
     try {
-      const response: AxiosResponse<unknown> = await axios.post('http://localhost:8000/auth/sign-in', params, {
+      const response: AxiosResponse<unknown> = await axios.post('http://kuk.solution:8000/auth/sign-in', params, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -88,7 +88,7 @@ class AuthClient {
     }
 
     try {
-      const response: AxiosResponse<unknown> = await axios.get('http://localhost:8000/auth/user', {
+      const response: AxiosResponse<unknown> = await axios.get('http://kuk.solution:8000/auth/user', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

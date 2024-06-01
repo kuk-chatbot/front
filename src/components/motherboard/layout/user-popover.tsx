@@ -75,7 +75,7 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
       }
 
       try {
-        const response = await axios.get('http://localhost:8000/motherboard/account', {
+        const response = await axios.get('http://kuk.solution:8000/motherboard/account', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

@@ -131,6 +131,9 @@ const useSendBird = () => {
               setTimeout(() => {
                 setLoading(false); // 로딩 종료
               }, remainingTime);
+
+              // 성공 시 리다이렉션
+              window.location.href = 'http://kuk.solution:3000/motherboard/summary';
             })
             .catch((error) => {
               console.error('Error sending file or metadata to server:', error);

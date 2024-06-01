@@ -74,7 +74,7 @@ export function SummaryTable({
       }
 
       try {
-        const response = await axios.get('http://localhost:8000/motherboard/summary', {
+        const response = await axios.get('http://kuk.solution:8000/motherboard/summary', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -103,7 +103,7 @@ export function SummaryTable({
       }
 
       console.log(`Fetching image for ID: ${id}`);
-      const response = await axios.get(`http://localhost:8000/motherboard/summary/${id}`, {
+      const response = await axios.get(`http://kuk.solution:8000/motherboard/summary/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
