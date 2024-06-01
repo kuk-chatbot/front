@@ -5,7 +5,6 @@ import SendBird, { FileMessage, GroupChannel, SendBirdInstance, UserMessageParam
 const APP_ID = '8AA2992B-477B-4759-A149-0B3C29BE23CF'; // Sendbird Dashboard에서 생성한 앱 ID
 const USER_ID = 'klsj9810'; // Sendbird에 연결할 사용자 ID
 const CHATBOT_USER_ID = 'onboarding_bot'; // 챗봇의 사용자 ID
-const CHANNEL_URL = 'sendbird_group_channel_188157088_0a3cf77688448e08453cbbb1be98b3de1a6a7853'; // Sendbird 채널 URL
 
 interface Answer {
   message: string;
@@ -17,6 +16,9 @@ const useSendBird = () => {
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [modelName, setModelName] = useState<string | null>(null);
   const [cause, setCause] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [result, setResult] = useState<string>('');
+  const [resultImage, setResultImage] = useState<string>('');
 
   useEffect(() => {
     const jwtToken = localStorage.getItem('custom-auth-token'); // 로컬 스토리지에서 JWT 토큰 가져오기
@@ -55,11 +57,25 @@ const useSendBird = () => {
       if (message.messageType === 'user' && message.sender && message.sender.userId !== CHATBOT_USER_ID) {
         const userMessage = message.message;
         console.log('Received text message:', userMessage);
+        // "증상 ~" 또는 "모델명 ~" 패턴을 찾음
+        const causeMatch = userMessage?.match(/증상:\s*([^,]+)/);
+        const modelNameMatch = userMessage?.match(/모델명:\s*([^,]+)/);
+
+        if (causeMatch) {
+          console.log(causeMatch);
+          setCause(causeMatch[1].trim());
+        }
+        if (modelNameMatch) {
+          console.log(modelName);
+          setModelName(modelNameMatch[1].trim());
+        }
       } else if (message.messageType === 'file' && message.sender && message.sender.userId !== CHATBOT_USER_ID) {
         // 파일 메시지
         const fileMessage = message;
         console.log('Received file message:', fileMessage.url);
         try {
+          setLoading(true); // 로딩 시작
+          const startTime = Date.now(); // 시작 시간 기록
           const file = await urlToFile(fileMessage.url, 'image.jpg', 'image/jpeg');
           const data = new FormData();
           data.append('image', file);
@@ -84,14 +100,20 @@ const useSendBird = () => {
               const answerData = response.data;
               // answerData 객체를 문자열로 변환하여 Sendbird 메시지로 설정
               setAnswer({
-                message: `CPU Fan: 1, No Screws: 2, Loose Screws: 3`,
-                resultImage: 'https://cdn-icons-png.flaticon.com/128/8943/8943377.png', // assuming resultImage is part of the response data
+                message: `CPU Fan No Screws: ${answerData.cpuFanNoScrews || 0}<br> 
+                CPU Fan Port Detached: ${answerData.cpuFanPortDetached || 0}<br> 
+                CPU Fan Screws Loose: ${answerData.cpuFanScrewsLoose || 0}<br> 
+                Incorrect Screws: ${answerData.incorrectScrews || 0}<br> 
+                Loose Screws: ${answerData.looseScrews || 0}<br> 
+                No Screws: ${answerData.noScrews || 0}<br> 
+                Scratch: ${answerData.scratch || 0}<br>`,
+                resultImage: `data:image/jpeg;base64,${answerData.resultImage}`, // Ensure it's base64 encoded
               });
-              // 위 코드는 하드 코딩된 코드입니다. 아래를 사용해주세요.
-              // setAnswer({
-              //   message: `CPU Fan: ${answerData.cpuFan}, No Screws: ${answerData.cpuFanNoScrews}, Loose Screws: ${answerData.cpuFanScrewsLoose}`,
-              //   resultImage: answerData.resultImage, // assuming resultImage is part of the response data
-              // });
+              const elapsedTime = Date.now() - startTime;
+              const remainingTime = Math.max(3000 - elapsedTime, 0); // 최소 3초 보장
+              setTimeout(() => {
+                setLoading(false); // 로딩 종료
+              }, remainingTime);
             })
             .catch((error) => {
               console.error('Error sending file to server:', error);
@@ -109,7 +131,7 @@ const useSendBird = () => {
     };
   }, [sendbirdInstance, modelName, cause]);
 
-  return { sendbirdInstance, answer, modelName, cause };
+  return { sendbirdInstance, answer, modelName, cause, loading, result, resultImage, setResult, setResultImage };
 };
 
 export default useSendBird;

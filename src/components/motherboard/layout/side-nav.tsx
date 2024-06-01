@@ -10,9 +10,10 @@ import Typography from '@mui/material/Typography';
 import { CaretUpDown as CaretUpDownIcon } from '@phosphor-icons/react/dist/ssr/CaretUpDown';
 
 import { paths } from '@/paths';
-import { Logo } from '@/components/core/logo';
 import { useUserType } from '@/hooks/use-usertype';
-import { personalNavItems, enterpriseNavItems } from './nav-config';
+import { Logo } from '@/components/core/logo';
+
+import { enterpriseNavItems, personalNavItems } from './nav-config';
 import { renderNavItems } from './render-nav-items';
 
 export function SideNav(): React.JSX.Element {
@@ -32,7 +33,7 @@ export function SideNav(): React.JSX.Element {
   }
 
   const navItems = userType === 'PERSONAL' ? personalNavItems : enterpriseNavItems;
-
+  const workspaceName = userType === 'PERSONAL' ? 'Personal' : 'Enterprise';
   return (
     <Box
       sx={{
@@ -81,7 +82,7 @@ export function SideNav(): React.JSX.Element {
               Workspace
             </Typography>
             <Typography color="inherit" variant="subtitle1">
-              Devias
+              {workspaceName}
             </Typography>
           </Box>
           <CaretUpDownIcon />
