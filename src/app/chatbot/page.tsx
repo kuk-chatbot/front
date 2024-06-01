@@ -27,11 +27,5 @@ export default function Page(): React.JSX.Element {
 
   // const paginatedsummary = applyPagination(summary, page, rowsPerPage);
 
-  return (
-    <Layout>
-      <Stack spacing={3}>
-        <ChatbotTable />
-      </Stack>
-    </Layout>
-  );
+  return <ChatbotTable />;
 }
