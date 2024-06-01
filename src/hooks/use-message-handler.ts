@@ -39,12 +39,14 @@ const useSendBird = () => {
   }, []);
 
   const proxyImageUrl = (imageUrl: string) =>
-    `http://localhost:8000/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
+    `http://kuk.solution:8000/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
 
-  const urlToFile = async (url: string, filename: string, mimeType: string): Promise<File> => {
+  const urlToFile = async (url: string): Promise<File> => {
     const response = await fetch(proxyImageUrl(url));
     const blob = await response.blob();
-    return new File([blob], filename, { type: mimeType });
+    const mimeType = blob.type; // 기본 MIME 타입 설정
+    const fileName = url.split('/').pop()?.split('?')[0] || 'image.jpg'; // URL에서 파일 이름 추출
+    return new File([blob], fileName, { type: mimeType });
   };
 
   useEffect(() => {
@@ -76,7 +78,8 @@ const useSendBird = () => {
         try {
           setLoading(true); // 로딩 시작
           const startTime = Date.now(); // 시작 시간 기록
-          const file = await urlToFile(fileMessage.url, 'image.jpg', 'image/jpeg');
+          const file = await urlToFile(fileMessage.url);
+          console.log(file);
           const data = new FormData();
           data.append('image', file);
           data.append('modelName', modelName ?? 'KUK001');
@@ -90,7 +93,7 @@ const useSendBird = () => {
           const jwtToken = localStorage.getItem('custom-auth-token'); // 로컬 스토리지에서 JWT 토큰 가져오기
 
           axios
-            .post('http://localhost:8000/motherboard/upload', data, {
+            .post('http://kuk.solution:8000/motherboard/upload', data, {
               headers: {
                 Authorization: `Bearer ${jwtToken}`,
                 'Content-Type': 'multipart/form-data',
@@ -117,9 +120,11 @@ const useSendBird = () => {
             })
             .catch((error) => {
               console.error('Error sending file to server:', error);
+              setLoading(false); // 로딩 종료
             });
         } catch (error) {
           console.error('Error converting URL to file:', error);
+          setLoading(false); // 로딩 종료
         }
       }
     };
